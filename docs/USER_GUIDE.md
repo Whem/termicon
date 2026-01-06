@@ -35,6 +35,24 @@ termicon-cli ssh --host example.com --user admin
 4. Click "Connect"
 5. When prompted, save the connection as a profile for quick access later
 
+### Using Profiles
+
+**Connecting from Profile:**
+- **Double-click** a profile in the side panel to connect immediately
+- Or click the **Connect** button next to the profile
+
+**Profile Features:**
+- Filter profiles by type (All, Serial, TCP, SSH, etc.)
+- Search profiles by name
+- Profiles are sorted by usage frequency
+- Toggle favorite status with star button
+
+**Commands (Profile-specific):**
+- Any command you type while connected via a profile is saved automatically
+- Commands are sorted by frequency of use
+- **Double-click** a command to insert it into the input field
+- Delete commands with the X button
+
 ## Connection Types
 
 ### Serial Port (S/)
@@ -214,6 +232,7 @@ Access via **Transfer** menu button:
 | XMODEM-1K | 1024-byte blocks |
 | YMODEM | Batch mode with file info |
 | ZMODEM | Streaming, auto-start |
+| Kermit | Full protocol with quoting and checksums |
 
 ### SFTP (SSH only)
 
@@ -242,6 +261,55 @@ Record and replay actions:
 3. Stop recording
 4. Save and replay
 
+### Trigger Chains
+
+Create multi-step triggers:
+1. Define a sequence of patterns
+2. Each pattern triggers the next step
+3. Configure timeout and retry behavior
+
+### Batch Operations
+
+Execute commands on multiple sessions:
+1. Select sessions
+2. Define command sequence
+3. Run in parallel or sequential mode
+
+## Menu System
+
+### File Menu
+- **New Tab (Ctrl+T)** - Create a new session tab
+- **Close Tab (Ctrl+W)** - Close current tab
+- **Exit** - Close application
+
+### Edit Menu
+- **Clear Terminal** - Clear the terminal output
+
+### View Menu
+- **Show Timestamps** - Toggle timestamp display
+- **Hex View** - Toggle hex data display
+- **Local Echo** - Toggle local echo
+- **Side Panel** - Toggle side panel visibility
+- **Macros Bar (M1-M24)** - Toggle macros toolbar
+
+### Connection Menu
+- **Serial Port** - Serial connection options and bridge
+- **Network** - TCP Client and Telnet
+- **SSH** - SSH connect, SFTP, key generation
+- **Bluetooth LE** - BLE connections
+
+### Tools Menu
+- **File Transfer** - XMODEM, YMODEM, ZMODEM, Kermit
+- **Protocols** - Modbus Monitor, NMEA Viewer, Protocol DSL
+- **Triggers & Auto-response** - Pattern matching triggers
+- **Macro Recorder** - Record and playback macros
+- **Advanced** - Device Simulator, Session Replay, Fuzzing, Experiment Mode
+
+### Help Menu
+- **User Guide** - Open documentation
+- **Keyboard Shortcuts** - Show shortcuts
+- **About** - Application info
+
 ## Settings
 
 ### Theme
@@ -251,6 +319,7 @@ Record and replay actions:
 ### Language
 - **EN** - English
 - **HU** - Magyar (Hungarian)
+- Click the language button in toolbar to switch instantly
 
 ### Terminal Options
 - Local Echo
@@ -259,17 +328,72 @@ Record and replay actions:
 - Auto-scroll
 - Line Ending (CR, LF, CRLF)
 
+### Accessibility
+- **High Contrast Mode** - Maximum contrast colors
+- **Font Scaling** - Adjust text size (75%-200%)
+- **Focus Indicators** - Clear focus highlighting
+
+### Custom Themes
+12+ built-in color schemes:
+- Dracula, Monokai, Solarized (Dark/Light)
+- Nord, One Dark, Gruvbox, Tokyo Night
+- And more...
+
 ## Keyboard Shortcuts
 
+### General
 | Shortcut | Action |
 |----------|--------|
+| Ctrl+K | Command Palette |
 | Ctrl+T | New tab |
 | Ctrl+W | Close tab |
 | Ctrl+D | Disconnect |
 | Ctrl+L | Clear screen |
+| Ctrl+S | Save session log |
+| Ctrl+F | Search in output |
+| Ctrl+G | Toggle chart panel |
+| Ctrl+P | Toggle profiles panel |
+| Escape | Close dialogs/panels |
+
+### Terminal
+| Shortcut | Action |
+|----------|--------|
 | Enter | Send command |
 | Up/Down | Command history |
+| Ctrl+C | Copy selection |
+| Ctrl+V | Paste |
+| Page Up/Down | Scroll output |
+| Home/End | Jump to start/end |
+
+### Macros
+| Shortcut | Action |
+|----------|--------|
 | F1-F12 | Execute M1-M12 macros |
+| Shift+F1-F12 | Execute M13-M24 macros |
+
+### Navigation
+| Shortcut | Action |
+|----------|--------|
+| Tab | Focus next element |
+| Shift+Tab | Focus previous element |
+| Alt+1-9 | Switch to tab 1-9 |
+| Ctrl+Tab | Next tab |
+| Ctrl+Shift+Tab | Previous tab |
+
+## Command Palette (Ctrl+K)
+
+Quick access to all commands:
+1. Press Ctrl+K to open
+2. Type to search commands
+3. Use arrow keys to navigate
+4. Enter to execute
+
+Command categories:
+- **Connection** - New connections, disconnect
+- **View** - Toggle panels, themes
+- **File** - Save, export, transfer
+- **Tools** - Macros, triggers, automation
+- **Help** - Documentation, about
 
 ## CLI Usage
 
@@ -288,7 +412,30 @@ termicon-cli ssh --host example.com --user admin
 
 # Headless mode (for automation)
 termicon-cli serial --port COM3 --headless --script myscript.txt
+
+# Pipe support
+echo "AT" | termicon-cli serial --port COM3 --baud 115200
+termicon-cli serial --port COM3 | tee output.log
+
+# Output format (raw, hex, json)
+termicon-cli serial --port COM3 --output-format json
+
+# Exit codes for scripting
+termicon-cli serial --port COM3 --command "AT" && echo "Success"
 ```
+
+### Exit Codes
+
+| Code | Description |
+|------|-------------|
+| 0 | Success |
+| 1 | General error |
+| 2 | Invalid arguments |
+| 3 | Connection failed |
+| 4 | Connection timeout |
+| 5 | Authentication failed |
+| 6 | File not found |
+| 14 | Port not found |
 
 ## Troubleshooting
 

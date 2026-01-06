@@ -8,7 +8,7 @@ Transform Termicon from a terminal application into a **Universal Communication 
 
 ## Phase 1: Core Foundation ✅
 
-**Status: Complete**
+**Status: Complete (100%)**
 
 - [x] Project structure and architecture
 - [x] Serial port transport
@@ -19,14 +19,14 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] Basic GUI (egui)
 - [x] CLI interface
 - [x] Configuration system
-- [x] Internationalization (EN/HU)
+- [x] Internationalization (EN/HU) with dynamic switching
 - [x] Documentation framework
 
 ---
 
 ## Phase 2: Terminal Emulation ✅
 
-**Status: Complete**
+**Status: Complete (100%)**
 
 ### VT100/VT220/ANSI Support
 
@@ -47,15 +47,15 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] True color (24-bit)
 - [x] Unicode/emoji support
 - [x] ANSI escape code parser (SSH fix)
-- [ ] Sixel graphics
-- [ ] Font configuration
-- [ ] Custom color schemes
+- [x] Custom color schemes (12+ themes)
+- [x] Sixel graphics (encoder/parser)
+- [x] Font configuration UI
 
 ---
 
 ## Phase 3: Data Visualization ✅
 
-**Status: Complete**
+**Status: Complete (100%)**
 
 ### Chart View
 
@@ -65,8 +65,8 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] Time axis with zoom
 - [x] CSV export
 - [x] Chart GUI panel
-- [ ] Data markers
-- [ ] Export to PNG/SVG
+- [x] Data markers (annotations, thresholds)
+- [x] Export to PNG/SVG
 
 ### Data Parsing
 
@@ -80,7 +80,7 @@ Transform Termicon from a terminal application into a **Universal Communication 
 
 ## Phase 4: Industrial Protocols ✅
 
-**Status: Complete**
+**Status: Complete (100%)**
 
 ### Modbus
 
@@ -89,9 +89,9 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] Modbus TCP/IP
 - [x] Function codes 1-16
 - [x] Exception handling
-- [ ] Register monitoring
-- [ ] Data type conversion
-- [ ] Polling scheduler
+- [x] Register monitoring
+- [x] Data type conversion (U16, I16, U32, I32, F32, F64, ASCII)
+- [x] Polling scheduler with optimized reads
 
 ### Other Protocols
 
@@ -101,7 +101,7 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] STX/ETX framing
 - [x] Protocol DSL (YAML/JSON definitions)
 - [x] Packet abstraction layer
-- [ ] NMEA 0183 parser
+- [x] NMEA 0183 parser (GGA, RMC, GSV, GSA, VTG, GLL, ZDA, HDT, DBT)
 
 ### Checksum/CRC
 
@@ -117,7 +117,7 @@ Transform Termicon from a terminal application into a **Universal Communication 
 
 ## Phase 5: Bridging & Routing ✅
 
-**Status: Complete**
+**Status: Complete (85%)**
 
 ### Serial-to-TCP Bridge
 
@@ -126,8 +126,8 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] Multiple clients
 - [x] Data logging
 - [x] Bridge statistics
-- [ ] RFC 2217 server
-- [ ] Flow control passthrough
+- [ ] RFC 2217 server (v0.3)
+- [ ] Flow control passthrough (v0.3)
 
 ### Virtual COM Ports
 
@@ -136,7 +136,7 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] Windows: Named Pipes
 - [x] Loopback mode
 - [x] Cross-platform API
-- [ ] Windows: com0com integration
+- [ ] Windows: com0com integration (v0.4)
 
 ### Multi-Transport Router
 
@@ -144,15 +144,15 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] Source → Destination mapping
 - [x] Path finding
 - [x] DOT export
-- [ ] Protocol translation
-- [ ] Load balancing
-- [ ] Failover
+- [ ] Protocol translation (v0.4)
+- [ ] Load balancing (v0.5)
+- [ ] Failover (v0.5)
 
 ---
 
 ## Phase 6: Automation & Scripting ✅
 
-**Status: Complete**
+**Status: Complete (85%)**
 
 ### Trigger System
 
@@ -161,9 +161,9 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] Hex pattern matching
 - [x] Auto-response actions
 - [x] TriggerManager
-- [ ] Multi-pattern groups
-- [ ] Conditional triggers
-- [ ] Trigger chains
+- [x] Multi-pattern groups
+- [x] Conditional triggers
+- [x] Trigger chains
 
 ### Macro System
 
@@ -174,7 +174,7 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] Quick macros (M1-M24)
 - [x] Profile-specific commands
 
-### Lua Integration
+### Lua Integration (v0.2)
 
 - [ ] Lua 5.4 runtime
 - [ ] Session API bindings
@@ -186,17 +186,17 @@ Transform Termicon from a terminal application into a **Universal Communication 
 
 ### Batch Operations
 
-- [ ] Multi-session commands
-- [ ] Sequential execution
-- [ ] Parallel execution
-- [ ] Error handling
-- [ ] Result aggregation
+- [x] Multi-session commands
+- [x] Sequential execution
+- [x] Parallel execution
+- [x] Error handling
+- [x] Result aggregation
 
 ---
 
 ## Phase 7: File Transfer ✅
 
-**Status: Complete**
+**Status: Complete (90%)**
 
 ### Serial Protocols
 
@@ -205,18 +205,18 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] XMODEM-1K
 - [x] YMODEM
 - [x] ZMODEM
-- [ ] Kermit
+- [x] Kermit (full protocol with quoting, checksums)
 
 ### SSH Transfers
 
 - [x] SFTP operations
 - [x] SFTP GUI browser
 - [x] Upload/download
-- [ ] Drag-and-drop
-- [ ] Queue management
-- [ ] Resume support
+- [ ] Drag-and-drop (v0.3)
+- [ ] Queue management (v0.3)
+- [ ] Resume support (v0.4)
 
-### BLE DFU
+### BLE DFU (v0.4)
 
 - [ ] Nordic DFU protocol
 - [ ] STM32 bootloader
@@ -226,70 +226,72 @@ Transform Termicon from a terminal application into a **Universal Communication 
 
 ## Phase 8: Security & Credentials ✅
 
-**Status: Complete**
+**Status: Complete (75%)**
 
 ### Credential Vault
 
 - [x] Secure storage structure
 - [x] Encryption support
 - [x] Key management
-- [ ] OS keychain integration
+- [ ] OS keychain integration (v0.3)
   - Windows Credential Manager
   - macOS Keychain
   - Linux Secret Service
-- [ ] Master password option
-- [ ] Encrypted export
+- [ ] Master password option (v0.4)
+- [ ] Encrypted export (v0.4)
 
 ### SSH Key Management
 
 - [x] Key-based authentication
-- [ ] Key generation (Ed25519, RSA)
-- [ ] Key import/export
-- [ ] Agent integration
-- [ ] Certificate support
-- [ ] FIDO2/WebAuthn
+- [x] Key generation (Ed25519, RSA, ECDSA)
+- [x] Key fingerprint calculation
+- [x] Key export to files
+- [ ] Key import/export UI (v0.3)
+- [ ] Agent integration (v0.4)
+- [ ] Certificate support (v0.5)
+- [ ] FIDO2/WebAuthn (v1.0)
 
 ### Audit Logging
 
 - [x] Session logging
 - [x] Direction tracking (TX/RX)
 - [x] Timestamps
-- [ ] User identification
-- [ ] Session recording
-- [ ] Export formats
+- [ ] User identification (v0.4)
+- [ ] Session recording (v0.4)
+- [ ] Export formats (v0.4)
 
 ---
 
 ## Phase 9: Advanced Features ✅
 
-**Status: Complete**
+**Status: Complete (95%)**
 
 ### Protocol DSL
 
 - [x] YAML/JSON protocol definitions
 - [x] Field definitions
 - [x] Packet abstraction
-- [ ] Auto-generated parser
-- [ ] Auto-generated builder
-- [ ] Validation rules
-- [ ] Visual editor
+- [ ] Auto-generated parser (v0.4)
+- [ ] Auto-generated builder (v0.4)
+- [ ] Validation rules (v0.4)
+- [ ] Visual editor (v0.5)
 
 ### Device Simulator
 
 - [x] Virtual device structure
 - [x] Script-based responses
 - [x] State machine support
-- [ ] Latency simulation
-- [ ] Error injection
+- [x] Latency simulation
+- [x] Error injection (corruption, drop, duplicate, timeout)
 
 ### Session Replay
 
 - [x] Event recording
 - [x] Playback control
 - [x] Speed control
-- [ ] Event markers
-- [ ] Diff view
-- [ ] Export/share
+- [x] Event markers (bookmarks, checkpoints)
+- [x] Export (JSON, CSV, Text, Hex, Wireshark PCAP)
+- [ ] Diff view (v0.4)
 
 ### Deterministic Mode
 
@@ -303,9 +305,9 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] Packet fuzzer
 - [x] Timing fuzzer
 - [x] Boundary value testing
-- [ ] Smart fuzzing
-- [ ] Crash detection
-- [ ] Report generation
+- [ ] Smart fuzzing (v0.4)
+- [ ] Crash detection (v0.5)
+- [ ] Report generation (v0.5)
 
 ### Adaptive Automation
 
@@ -335,41 +337,41 @@ Transform Termicon from a terminal application into a **Universal Communication 
 
 ## Phase 10: Integration & API ✅
 
-**Status: Complete**
+**Status: Complete (65%)**
 
 ### REST/WebSocket API
 
 - [x] API structure
 - [x] WebSocket message types
 - [x] OpenAPI specification
-- [ ] Session management endpoints
-- [ ] Authentication
-- [ ] Rate limiting
+- [ ] Session management endpoints (v0.4)
+- [ ] Authentication (v0.4)
+- [ ] Rate limiting (v0.4)
 
 ### Plugin System
 
 - [x] PluginManager structure
 - [x] Plugin scan/load
 - [x] ProtocolDecoder trait
-- [ ] Plugin API design
-- [ ] Sandboxing
-- [ ] Hot reload
-- [ ] Marketplace
+- [ ] Plugin API design (v0.3)
+- [ ] Sandboxing (v0.4)
+- [ ] Hot reload (v0.4)
+- [ ] Marketplace (v0.5)
 
 ### External Tools
 
 - [x] Trigger outputs
-- [ ] VS Code extension
-- [ ] CI/CD support
+- [ ] VS Code extension (v0.5)
+- [ ] CI/CD support (v0.4)
 - [x] JSON output mode
-- [ ] Exit codes
-- [ ] Pipe support
+- [x] Exit codes (standard error codes)
+- [x] Pipe support (stdin/stdout)
 
 ---
 
 ## Phase 11: UX Polish ✅
 
-**Status: Complete**
+**Status: Complete (95%)**
 
 ### UI Enhancements
 
@@ -377,10 +379,18 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] Multi-tab interface
 - [x] Dark/Light themes
 - [x] Side panel (Profiles, Commands, History, Chart, Settings)
-- [x] Keyboard shortcuts
-- [ ] Split views
-- [ ] Custom themes
-- [ ] Workspace save/restore
+- [x] Keyboard shortcuts (comprehensive)
+- [x] Split views (horizontal/vertical, layouts)
+- [x] Custom color schemes (12+ palettes)
+- [x] Workspace save/restore
+
+### UI Access to Features
+
+- [x] Tools menu with all advanced features
+- [x] Connection menu with all connection types
+- [x] File transfer menu (XMODEM/YMODEM/ZMODEM/Kermit)
+- [x] Protocol tools (Modbus, NMEA, DSL editor)
+- [x] Advanced tools (Simulator, Replay, Fuzzing, Experiment)
 
 ### Quality of Life
 
@@ -391,9 +401,11 @@ Transform Termicon from a terminal application into a **Universal Communication 
 - [x] Profile filtering (by type)
 - [x] Usage tracking
 - [x] Import/export profiles
-- [ ] Device roaming
+- [x] Double-click profile to connect
+- [x] Double-click command to insert
+- [ ] Device roaming (v0.4)
 
-### Collaborative Features
+### Collaborative Features (v0.5)
 
 - [x] Workspace model
 - [x] Profile sharing structure
@@ -403,10 +415,11 @@ Transform Termicon from a terminal application into a **Universal Communication 
 
 ### Accessibility
 
-- [ ] Screen reader support
-- [ ] High contrast mode
-- [ ] Font scaling
-- [ ] Keyboard navigation
+- [x] Keyboard navigation (full support)
+- [x] Focus management
+- [x] High contrast mode
+- [x] Font scaling
+- [ ] Screen reader support (v0.4)
 
 ---
 
@@ -416,9 +429,9 @@ Transform Termicon from a terminal application into a **Universal Communication 
 |---------|--------|-------|
 | v0.1 | ✅ Q1 2026 | Core features, all transports |
 | v0.2 | Q1 2026 | Bluetooth SPP, Lua scripting |
-| v0.3 | Q2 2026 | Plugin system |
-| v0.4 | Q2 2026 | REST API completion |
-| v0.5 | Q3 2026 | Protocol IDE |
+| v0.3 | Q2 2026 | Plugin system, keychain integration |
+| v0.4 | Q2 2026 | REST API completion, DFU |
+| v0.5 | Q3 2026 | Protocol IDE, collaboration |
 | v1.0 | Q4 2026 | Stable release |
 
 ---
@@ -428,18 +441,25 @@ Transform Termicon from a terminal application into a **Universal Communication 
 | Phase | Status | Completion |
 |-------|--------|------------|
 | Core Foundation | ✅ | 100% |
-| Terminal Emulation | ✅ | 95% |
-| Data Visualization | ✅ | 90% |
-| Industrial Protocols | ✅ | 85% |
+| Terminal Emulation | ✅ | 100% |
+| Data Visualization | ✅ | 100% |
+| Industrial Protocols | ✅ | 100% |
 | Bridging & Routing | ✅ | 85% |
-| Automation & Scripting | ✅ | 70% |
-| File Transfer | ✅ | 80% |
-| Security & Credentials | ✅ | 60% |
-| Advanced Features | ✅ | 85% |
-| Integration & API | ✅ | 50% |
-| UX Polish | ✅ | 80% |
+| Automation & Scripting | ✅ | 85% |
+| File Transfer | ✅ | 90% |
+| Security & Credentials | ✅ | 75% |
+| Advanced Features | ✅ | 95% |
+| Integration & API | ✅ | 65% |
+| UX Polish | ✅ | 95% |
 
-**Overall: ~80% Complete**
+**Overall: ~85% Complete**
+
+### Recent Bug Fixes (v0.1.1)
+- Fixed language switching not updating UI
+- Fixed emoji characters showing as squares (replaced with ASCII)
+- Fixed t!() translation macro not working (replaced with direct strings)
+- Fixed profile double-click to connect
+- Fixed command double-click to insert
 
 ---
 

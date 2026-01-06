@@ -198,7 +198,7 @@ impl MacrosPanel {
             }
 
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                if ui.small_button("⚙").on_hover_text("Set Macros").clicked() {
+                if ui.small_button("*").on_hover_text("Set Macros").clicked() {
                     self.expanded = !self.expanded;
                 }
             });

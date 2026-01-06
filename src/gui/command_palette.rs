@@ -473,7 +473,7 @@ impl CommandPalette {
                         
                         // Search input
                         ui.horizontal(|ui| {
-                            ui.label(RichText::new("🔍").size(18.0));
+                            ui.label(RichText::new(">").size(18.0));
                             let response = ui.add(
                                 egui::TextEdit::singleline(&mut self.query)
                                     .hint_text("Type a command...")

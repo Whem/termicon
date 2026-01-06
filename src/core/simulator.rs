@@ -109,6 +109,254 @@ pub enum ResponseAction {
     Script { code: String },
     /// No response
     None,
+    /// Inject error - corrupt data
+    InjectCorruption { probability: f32, max_bytes: usize },
+    /// Inject error - drop packet
+    InjectDrop { probability: f32 },
+    /// Inject error - duplicate packet
+    InjectDuplicate { probability: f32 },
+    /// Inject error - reorder with next
+    InjectReorder { probability: f32 },
+    /// Add jitter to timing
+    InjectJitter { base_ms: u64, jitter_ms: u64 },
+    /// Simulate timeout (no response after delay)
+    SimulateTimeout { probability: f32 },
+}
+
+/// Latency simulation configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LatencyConfig {
+    /// Base latency in ms
+    pub base_latency_ms: u64,
+    /// Random jitter range in ms
+    pub jitter_ms: u64,
+    /// Enable latency simulation
+    pub enabled: bool,
+    /// Latency distribution type
+    pub distribution: LatencyDistribution,
+}
+
+impl Default for LatencyConfig {
+    fn default() -> Self {
+        Self {
+            base_latency_ms: 0,
+            jitter_ms: 0,
+            enabled: false,
+            distribution: LatencyDistribution::Uniform,
+        }
+    }
+}
+
+/// Latency distribution types
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Default)]
+pub enum LatencyDistribution {
+    /// Uniform random distribution
+    #[default]
+    Uniform,
+    /// Normal (Gaussian) distribution
+    Normal,
+    /// Exponential distribution
+    Exponential,
+    /// Fixed (no variation)
+    Fixed,
+}
+
+/// Error injection configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ErrorInjectionConfig {
+    /// Enable error injection
+    pub enabled: bool,
+    /// Probability of corruption (0.0 - 1.0)
+    pub corruption_probability: f32,
+    /// Probability of packet drop (0.0 - 1.0)
+    pub drop_probability: f32,
+    /// Probability of packet duplication (0.0 - 1.0)
+    pub duplicate_probability: f32,
+    /// Probability of timeout (0.0 - 1.0)
+    pub timeout_probability: f32,
+    /// Max bytes to corrupt per packet
+    pub max_corruption_bytes: usize,
+    /// CRC error injection
+    pub inject_crc_errors: bool,
+    /// Framing error injection
+    pub inject_framing_errors: bool,
+}
+
+impl Default for ErrorInjectionConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            corruption_probability: 0.0,
+            drop_probability: 0.0,
+            duplicate_probability: 0.0,
+            timeout_probability: 0.0,
+            max_corruption_bytes: 1,
+            inject_crc_errors: false,
+            inject_framing_errors: false,
+        }
+    }
+}
+
+/// Error injector for simulating communication errors
+pub struct ErrorInjector {
+    config: ErrorInjectionConfig,
+}
+
+impl ErrorInjector {
+    pub fn new(config: ErrorInjectionConfig) -> Self {
+        Self { config }
+    }
+    
+    /// Apply error injection to data
+    pub fn process(&self, data: &[u8]) -> ErrorInjectionResult {
+        use rand::Rng;
+        let mut rng = rand::thread_rng();
+        
+        if !self.config.enabled {
+            return ErrorInjectionResult::Normal(data.to_vec());
+        }
+        
+        // Check for drop
+        if rng.gen::<f32>() < self.config.drop_probability {
+            return ErrorInjectionResult::Dropped;
+        }
+        
+        // Check for timeout
+        if rng.gen::<f32>() < self.config.timeout_probability {
+            return ErrorInjectionResult::Timeout;
+        }
+        
+        let mut result = data.to_vec();
+        
+        // Apply corruption
+        if rng.gen::<f32>() < self.config.corruption_probability && !result.is_empty() {
+            let num_bytes = rng.gen_range(1..=self.config.max_corruption_bytes.min(result.len()));
+            for _ in 0..num_bytes {
+                let idx = rng.gen_range(0..result.len());
+                result[idx] = rng.gen();
+            }
+            return ErrorInjectionResult::Corrupted(result);
+        }
+        
+        // Check for duplication
+        if rng.gen::<f32>() < self.config.duplicate_probability {
+            return ErrorInjectionResult::Duplicated(result);
+        }
+        
+        // Inject CRC error if enabled
+        if self.config.inject_crc_errors && !result.is_empty() {
+            // Corrupt last 2 bytes (common CRC location)
+            if result.len() >= 2 {
+                let len = result.len();
+                result[len - 1] ^= 0xFF;
+                result[len - 2] ^= 0xFF;
+            }
+            return ErrorInjectionResult::CrcError(result);
+        }
+        
+        // Inject framing error
+        if self.config.inject_framing_errors && !result.is_empty() {
+            // Add random bytes at start (break framing)
+            let garbage: Vec<u8> = (0..rng.gen_range(1..4)).map(|_| rng.gen()).collect();
+            let mut broken = garbage;
+            broken.extend(result);
+            return ErrorInjectionResult::FramingError(broken);
+        }
+        
+        ErrorInjectionResult::Normal(result)
+    }
+}
+
+/// Result of error injection
+#[derive(Debug, Clone)]
+pub enum ErrorInjectionResult {
+    /// Normal data (no error)
+    Normal(Vec<u8>),
+    /// Data was corrupted
+    Corrupted(Vec<u8>),
+    /// Packet was dropped
+    Dropped,
+    /// Packet was duplicated
+    Duplicated(Vec<u8>),
+    /// Timeout occurred
+    Timeout,
+    /// CRC error injected
+    CrcError(Vec<u8>),
+    /// Framing error injected
+    FramingError(Vec<u8>),
+}
+
+impl ErrorInjectionResult {
+    pub fn is_error(&self) -> bool {
+        !matches!(self, Self::Normal(_))
+    }
+    
+    pub fn data(&self) -> Option<&Vec<u8>> {
+        match self {
+            Self::Normal(d) | Self::Corrupted(d) | Self::Duplicated(d) 
+            | Self::CrcError(d) | Self::FramingError(d) => Some(d),
+            Self::Dropped | Self::Timeout => None,
+        }
+    }
+}
+
+/// Latency simulator
+pub struct LatencySimulator {
+    config: LatencyConfig,
+}
+
+impl LatencySimulator {
+    pub fn new(config: LatencyConfig) -> Self {
+        Self { config }
+    }
+    
+    /// Calculate latency for this request
+    pub fn calculate_latency(&self) -> Duration {
+        use rand::Rng;
+        
+        if !self.config.enabled {
+            return Duration::ZERO;
+        }
+        
+        let mut rng = rand::thread_rng();
+        
+        let latency_ms = match self.config.distribution {
+            LatencyDistribution::Fixed => self.config.base_latency_ms,
+            LatencyDistribution::Uniform => {
+                if self.config.jitter_ms > 0 {
+                    let jitter = rng.gen_range(0..=self.config.jitter_ms);
+                    self.config.base_latency_ms.saturating_add(jitter)
+                } else {
+                    self.config.base_latency_ms
+                }
+            }
+            LatencyDistribution::Normal => {
+                // Simplified normal distribution using Box-Muller
+                let u1: f64 = rng.gen();
+                let u2: f64 = rng.gen();
+                let z = (-2.0 * u1.ln()).sqrt() * (2.0 * std::f64::consts::PI * u2).cos();
+                let jitter = (z * self.config.jitter_ms as f64).abs() as u64;
+                self.config.base_latency_ms.saturating_add(jitter)
+            }
+            LatencyDistribution::Exponential => {
+                // Exponential distribution
+                let u: f64 = rng.gen();
+                let lambda = 1.0 / self.config.jitter_ms.max(1) as f64;
+                let exp_delay = (-u.ln() / lambda) as u64;
+                self.config.base_latency_ms.saturating_add(exp_delay.min(self.config.jitter_ms * 3))
+            }
+        };
+        
+        Duration::from_millis(latency_ms)
+    }
+    
+    /// Apply latency simulation
+    pub async fn apply(&self) {
+        let delay = self.calculate_latency();
+        if delay > Duration::ZERO {
+            tokio::time::sleep(delay).await;
+        }
+    }
 }
 
 impl ResponseAction {
@@ -224,6 +472,10 @@ pub struct VirtualDevice {
     running: Arc<RwLock<bool>>,
     /// Response channel
     response_tx: Option<mpsc::Sender<Vec<u8>>>,
+    /// Latency configuration
+    latency_config: LatencyConfig,
+    /// Error injection configuration
+    error_config: ErrorInjectionConfig,
 }
 
 impl VirtualDevice {
@@ -235,7 +487,29 @@ impl VirtualDevice {
             state: Arc::new(RwLock::new(DeviceState::default())),
             running: Arc::new(RwLock::new(false)),
             response_tx: None,
+            latency_config: LatencyConfig::default(),
+            error_config: ErrorInjectionConfig::default(),
         }
+    }
+    
+    /// Set latency configuration
+    pub fn set_latency_config(&mut self, config: LatencyConfig) {
+        self.latency_config = config;
+    }
+    
+    /// Set error injection configuration
+    pub fn set_error_config(&mut self, config: ErrorInjectionConfig) {
+        self.error_config = config;
+    }
+    
+    /// Get latency config
+    pub fn latency_config(&self) -> &LatencyConfig {
+        &self.latency_config
+    }
+    
+    /// Get error config
+    pub fn error_config(&self) -> &ErrorInjectionConfig {
+        &self.error_config
     }
 
     /// Add a response rule
@@ -263,6 +537,13 @@ impl VirtualDevice {
     /// Process input and generate response
     pub async fn process(&mut self, input: &[u8]) -> Vec<Vec<u8>> {
         let mut responses = Vec::new();
+        
+        // Apply latency simulation
+        let latency_sim = LatencySimulator::new(self.latency_config.clone());
+        latency_sim.apply().await;
+        
+        // Create error injector
+        let error_injector = ErrorInjector::new(self.error_config.clone());
 
         for rule in &mut self.rules {
             if !rule.enabled {
@@ -320,6 +601,51 @@ impl VirtualDevice {
                         // TODO: Lua scripting
                     }
                     ResponseAction::None => {}
+                    ResponseAction::InjectCorruption { probability, max_bytes } => {
+                        use rand::Rng;
+                        if rand::thread_rng().gen::<f32>() < *probability {
+                            let mut corrupted = input.to_vec();
+                            let num = (*max_bytes).min(corrupted.len());
+                            for _ in 0..num {
+                                let idx = rand::thread_rng().gen_range(0..corrupted.len());
+                                corrupted[idx] = rand::thread_rng().gen();
+                            }
+                            responses.push(corrupted);
+                        } else {
+                            responses.push(input.to_vec());
+                        }
+                    }
+                    ResponseAction::InjectDrop { probability } => {
+                        use rand::Rng;
+                        if rand::thread_rng().gen::<f32>() >= *probability {
+                            responses.push(input.to_vec());
+                        }
+                        // else: drop (no response)
+                    }
+                    ResponseAction::InjectDuplicate { probability } => {
+                        use rand::Rng;
+                        responses.push(input.to_vec());
+                        if rand::thread_rng().gen::<f32>() < *probability {
+                            responses.push(input.to_vec()); // Duplicate
+                        }
+                    }
+                    ResponseAction::InjectReorder { probability: _ } => {
+                        // Reordering would require buffering - simplified to just echo
+                        responses.push(input.to_vec());
+                    }
+                    ResponseAction::InjectJitter { base_ms, jitter_ms } => {
+                        use rand::Rng;
+                        let delay = *base_ms + rand::thread_rng().gen_range(0..=*jitter_ms);
+                        tokio::time::sleep(Duration::from_millis(delay)).await;
+                        responses.push(input.to_vec());
+                    }
+                    ResponseAction::SimulateTimeout { probability } => {
+                        use rand::Rng;
+                        if rand::thread_rng().gen::<f32>() >= *probability {
+                            responses.push(input.to_vec());
+                        }
+                        // else: timeout (no response)
+                    }
                 }
 
                 if rule.one_shot {
@@ -331,14 +657,31 @@ impl VirtualDevice {
             }
         }
 
+        // Apply error injection to all responses
+        let mut final_responses = Vec::new();
+        for response in responses {
+            match error_injector.process(&response) {
+                ErrorInjectionResult::Normal(d) => final_responses.push(d),
+                ErrorInjectionResult::Corrupted(d) => final_responses.push(d),
+                ErrorInjectionResult::Duplicated(d) => {
+                    final_responses.push(d.clone());
+                    final_responses.push(d);
+                }
+                ErrorInjectionResult::CrcError(d) => final_responses.push(d),
+                ErrorInjectionResult::FramingError(d) => final_responses.push(d),
+                ErrorInjectionResult::Dropped => {} // Don't add
+                ErrorInjectionResult::Timeout => {} // Don't add
+            }
+        }
+
         // Send through channel if configured
         if let Some(ref tx) = self.response_tx {
-            for response in &responses {
+            for response in &final_responses {
                 let _ = tx.send(response.clone()).await;
             }
         }
 
-        responses
+        final_responses
     }
 
     /// Get device state
@@ -476,6 +819,7 @@ mod tests {
         assert!(!hex.matches(&[0xAA, 0xFF, 0x04]));
     }
 }
+
 
 
 

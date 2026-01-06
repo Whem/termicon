@@ -4,12 +4,17 @@
 //! - Real-time line plots
 //! - Multi-channel support
 //! - Data parsing from various formats
-//! - Export capabilities
+//! - Export capabilities (PNG/SVG)
+//! - Data markers and annotations
 
 pub mod data;
+pub mod export;
+pub mod markers;
 pub mod parser;
 
 pub use data::{ChartData, DataPoint, ChartConfig, ChartChannel};
+pub use export::{SvgExporter, DataExporter, ExportFormat, ExportConfig, ExportSeries};
+pub use markers::{DataMarker, MarkerType, MarkerShape, MarkerManager};
 pub use parser::{DataParser, ParserConfig};
 
 use std::collections::HashMap;

@@ -90,6 +90,7 @@
 | Screen buffer | ✅ | `terminal/screen.rs` |
 | Mouse reporting | ✅ | `terminal/mod.rs` |
 | Unicode/UTF-8 | ✅ | - |
+| Sixel graphics | ✅ | `terminal/sixel.rs` |
 
 ### 2.2 GUI (egui/eframe)
 | Feature | Status | File |
@@ -115,6 +116,13 @@
 | Command palette | ✅ | `gui/command_palette.rs` |
 | BLE Inspector | ✅ | `gui/ble_panel.rs` |
 | Application icon | ✅ | `main.rs` |
+| Split views | ✅ | `gui/split_view.rs` |
+| Custom themes (12+) | ✅ | `gui/themes.rs` |
+| Keyboard shortcuts | ✅ | `gui/keyboard.rs` |
+| Focus management | ✅ | `gui/keyboard.rs` |
+| High contrast mode | ✅ | `gui/accessibility.rs` |
+| Font scaling | ✅ | `gui/accessibility.rs` |
+| Font configuration | ✅ | `gui/font_config.rs` |
 
 ### 2.3 CLI
 | Feature | Status | File |
@@ -123,6 +131,8 @@
 | list-ports | ✅ | `bin/cli.rs` |
 | Subcommands | ✅ | `bin/cli.rs` |
 | Headless mode | ✅ | `bin/cli.rs` |
+| Exit codes | ✅ | `cli/exit_codes.rs` |
+| Pipe support | ✅ | `cli/pipe.rs` |
 
 ---
 
@@ -155,8 +165,25 @@
 | TCP framing | ✅ | `protocol/modbus.rs` |
 | FC 1-16 | ✅ | `protocol/modbus.rs` |
 | Exception handling | ✅ | `protocol/modbus.rs` |
+| Register monitoring | ✅ | `protocol/modbus_monitor.rs` |
+| Data type conversion | ✅ | `protocol/modbus_monitor.rs` |
+| Polling scheduler | ✅ | `protocol/modbus_monitor.rs` |
 
-### 3.4 Protocol DSL
+### 3.4 NMEA 0183
+| Feature | Status | File |
+|---------|--------|------|
+| GGA (Fix Data) | ✅ | `protocol/nmea.rs` |
+| RMC (Recommended Minimum) | ✅ | `protocol/nmea.rs` |
+| GSV (Satellites in View) | ✅ | `protocol/nmea.rs` |
+| GSA (DOP and Active Sats) | ✅ | `protocol/nmea.rs` |
+| VTG (Track & Speed) | ✅ | `protocol/nmea.rs` |
+| GLL (Geographic Position) | ✅ | `protocol/nmea.rs` |
+| ZDA (Time & Date) | ✅ | `protocol/nmea.rs` |
+| HDT (Heading True) | ✅ | `protocol/nmea.rs` |
+| DBT (Depth) | ✅ | `protocol/nmea.rs` |
+| Checksum validation | ✅ | `protocol/nmea.rs` |
+
+### 3.5 Protocol DSL
 | Feature | Status | File |
 |---------|--------|------|
 | YAML/JSON definitions | ✅ | `protocol_dsl.rs` |
@@ -175,6 +202,7 @@
 | XMODEM-1K | ✅ | `transfer/mod.rs` |
 | YMODEM | ✅ | `transfer/mod.rs` |
 | ZMODEM | ✅ | `transfer/mod.rs` |
+| Kermit | ✅ | `file_transfer/kermit.rs` |
 
 ### 4.2 SSH File Transfer
 | Feature | Status | File |
@@ -200,12 +228,15 @@
 ### 5.2 Trigger System
 | Feature | Status | File |
 |---------|--------|------|
-| Exact pattern | ✅ | `trigger.rs` |
-| Text match | ✅ | `trigger.rs` |
-| Regex trigger | ✅ | `trigger.rs` |
-| Hex pattern | ✅ | `trigger.rs` |
-| Auto-response | ✅ | `trigger.rs` |
-| TriggerManager | ✅ | `trigger.rs` |
+| Exact pattern | ✅ | `trigger/mod.rs` |
+| Text match | ✅ | `trigger/mod.rs` |
+| Regex trigger | ✅ | `trigger/mod.rs` |
+| Hex pattern | ✅ | `trigger/mod.rs` |
+| Auto-response | ✅ | `trigger/mod.rs` |
+| TriggerManager | ✅ | `trigger/mod.rs` |
+| Multi-pattern groups | ✅ | `trigger/advanced.rs` |
+| Conditional triggers | ✅ | `trigger/advanced.rs` |
+| Trigger chains | ✅ | `trigger/advanced.rs` |
 
 ---
 
@@ -231,13 +262,30 @@
 | Timing capture | ✅ | `macro_recorder.rs` |
 | Loop playback | ✅ | `macro_recorder.rs` |
 
-### 6.3 Plugin/Scripting
+### 6.3 Batch Operations
+| Feature | Status | File |
+|---------|--------|------|
+| Multi-session commands | ✅ | `batch.rs` |
+| Sequential execution | ✅ | `batch.rs` |
+| Parallel execution | ✅ | `batch.rs` |
+| Error handling | ✅ | `batch.rs` |
+| Result aggregation | ✅ | `batch.rs` |
+
+### 6.4 Plugin/Scripting
 | Feature | Status | File |
 |---------|--------|------|
 | PluginManager | ✅ | `plugin/mod.rs` |
 | Plugin scan/load | ✅ | `plugin/mod.rs` |
 | ProtocolDecoder | ✅ | `plugin/mod.rs` |
 | Lua scripting | ❌ | - |
+
+### 6.5 Workspace
+| Feature | Status | File |
+|---------|--------|------|
+| Save workspace | ✅ | `workspace.rs` |
+| Restore workspace | ✅ | `workspace.rs` |
+| Session state | ✅ | `workspace.rs` |
+| Window layout | ✅ | `workspace.rs` |
 
 ---
 
@@ -292,6 +340,8 @@
 | Regex parser | ✅ | `chart/parser.rs` |
 | Export CSV | ✅ | `chart/mod.rs` |
 | Chart GUI | ✅ | `gui/chart_panel.rs` |
+| Data markers | ✅ | `chart/markers.rs` |
+| Export PNG/SVG | ✅ | `chart/export.rs` |
 
 ### 8.4 Deterministic Mode
 | Feature | Status | File |
@@ -300,6 +350,18 @@
 | Timing normalization | ✅ | `deterministic.rs` |
 | Reproducible runs | ✅ | `deterministic.rs` |
 | Session export | ✅ | `deterministic.rs` |
+
+### 8.4a Latency Simulation
+| Feature | Status | File |
+|---------|--------|------|
+| Base latency | ✅ | `simulator.rs` |
+| Jitter simulation | ✅ | `simulator.rs` |
+| Distribution types | ✅ | `simulator.rs` |
+| Error injection | ✅ | `simulator.rs` |
+| Packet corruption | ✅ | `simulator.rs` |
+| Packet drop | ✅ | `simulator.rs` |
+| Packet duplication | ✅ | `simulator.rs` |
+| Timeout simulation | ✅ | `simulator.rs` |
 
 ### 8.5 Fuzzing/Testing
 | Feature | Status | File |
@@ -366,6 +428,14 @@
 | Event recording | ✅ | `replay.rs` |
 | Playback control | ✅ | `replay.rs` |
 | Speed control | ✅ | `replay.rs` |
+| Event markers | ✅ | `replay.rs` |
+| Bookmarks | ✅ | `replay.rs` |
+| Checkpoints | ✅ | `replay.rs` |
+| Export JSON | ✅ | `replay.rs` |
+| Export CSV | ✅ | `replay.rs` |
+| Export Text | ✅ | `replay.rs` |
+| Export Hex | ✅ | `replay.rs` |
+| Export Wireshark PCAP | ✅ | `replay.rs` |
 
 ### 8.14 Virtual Device
 | Feature | Status | File |
@@ -380,6 +450,12 @@
 | Secure storage | ✅ | `vault.rs` |
 | Encryption | ✅ | `vault.rs` |
 | Key management | ✅ | `vault.rs` |
+| SSH Key Generation | ✅ | `vault.rs` |
+| Ed25519 keys | ✅ | `vault.rs` |
+| RSA keys | ✅ | `vault.rs` |
+| ECDSA keys | ✅ | `vault.rs` |
+| Key fingerprints | ✅ | `vault.rs` |
+| Key export | ✅ | `vault.rs` |
 
 ### 8.16 Knowledge Base
 | Feature | Status | File |
@@ -395,14 +471,14 @@
 | Category | Complete | Partial | Missing |
 |----------|----------|---------|---------|
 | Transport | 46 | 2 | 0 |
-| UI/Display | 41 | 0 | 0 |
-| Protocols | 24 | 0 | 0 |
-| File Transfer | 9 | 0 | 0 |
-| Logging | 11 | 0 | 0 |
-| Automation | 20 | 0 | 1 |
+| UI/Display | 54 | 0 | 0 |
+| Protocols | 38 | 0 | 0 |
+| File Transfer | 10 | 0 | 0 |
+| Logging | 14 | 0 | 0 |
+| Automation | 34 | 0 | 1 |
 | Configuration | 14 | 0 | 0 |
-| Advanced | 52 | 0 | 0 |
-| **TOTAL** | **217** | **2** | **1** |
+| Advanced | 54 | 0 | 0 |
+| **TOTAL** | **264** | **2** | **1** |
 
 ### Completion: ~99% complete
 
@@ -471,47 +547,76 @@ termicon/
 ## VERSION HISTORY
 
 ### v0.1.0 (Current)
+
+**Core Features:**
 - All core connection types (Serial, TCP, Telnet, SSH, Bluetooth)
 - Modern GUI with tabs, dark/light themes
 - Full terminal emulation (VT100/VT220, 256+true color, mouse)
 - Framing protocols (SLIP/COBS/STX-ETX/Length-prefix)
 - Checksums (CRC-16/32, XOR, LRC, Fletcher)
-- Modbus RTU/TCP
-- File transfer (XMODEM/YMODEM/ZMODEM)
+
+**Protocols:**
+- Modbus RTU/TCP with register monitoring
+- NMEA 0183 parser (GPS sentences)
+- Protocol DSL (YAML/JSON definitions)
+- Packet abstraction layer
+
+**File Transfer:**
+- XMODEM (128 byte, CRC, 1K variants)
+- YMODEM batch mode
+- ZMODEM streaming
+- Kermit full protocol
 - SFTP support + GUI browser
-- Network Bridge
-- Virtual COM ports
-- Profiles with usage tracking
-- Quick Macros (M1-M24)
-- Profile-specific commands
-- Triggers with auto-response
-- Real-time Charts
-- Session logging
-- Macro recording and playback
-- Search in output
-- Plugin system (structure)
-- i18n (EN/HU)
-- Bluetooth LE (BLE GATT, Nordic UART Service)
+
+**Infrastructure:**
+- Network Bridge (Serial ↔ TCP)
+- Virtual COM ports (PTY/Named Pipes)
 - Transport Capability Registry
 - Session State Machine
-- Packet Abstraction Layer
-- Protocol DSL (YAML/JSON)
-- Session Replay
-- Virtual Device Simulator
+- Routing Graph
+
+**Profiles & Automation:**
+- Profiles with usage tracking
+- Quick Macros (M1-M24)
+- Profile-specific commands sorted by usage
+- Triggers with auto-response
+- Multi-pattern groups and trigger chains
+- Macro recording and playback
+- Batch operations with parallel execution
+
+**Data Visualization:**
+- Real-time Charts with markers
+- Export to PNG/SVG
+- Session logging
+
+**Advanced Features:**
+- Bluetooth LE (BLE GATT, Nordic UART Service)
 - BLE Inspector UI
 - Credential Vault
-- CLI Parity (full command-line support)
+- CLI Parity with pipe support
 - Command Palette (Ctrl+K)
 - Knowledge Base
 - Deterministic Session Mode
 - Fuzzing/Robustness Testing
-- Routing Graph
 - Adaptive Automation
 - Resource Arbitration
 - Experiment/Parameter Sweep Mode
 - Explain Mode (Root Cause Hints)
 - Collaborative Features
 - External API (REST/WebSocket)
+- Session Replay with export
+- Virtual Device Simulator
+
+**UI/UX:**
+- Dynamic language switching (EN/HU)
+- Double-click profile to connect
+- Double-click command to insert
+- Comprehensive menu system (Connection, Tools, Help)
+- Split views
+- Custom color schemes (12+ palettes)
+- High contrast mode
+- Font scaling
+- Keyboard navigation
 
 ### v0.2.0 (Planned)
 - Bluetooth Classic SPP (RFCOMM)

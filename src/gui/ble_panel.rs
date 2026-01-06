@@ -162,7 +162,7 @@ impl BleInspectorPanel {
     /// Render the panel
     pub fn render(&mut self, ui: &mut egui::Ui) {
         ui.horizontal(|ui| {
-            ui.heading("📶 BLE Inspector");
+            ui.heading("BLE Inspector");
             
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 if self.scanning {
@@ -171,7 +171,7 @@ impl BleInspectorPanel {
                     }
                     ui.spinner();
                 } else {
-                    if ui.button("🔍 Scan").clicked() {
+                    if ui.button("Scan").clicked() {
                         self.scanning = true;
                         // TODO: Trigger actual scan
                     }

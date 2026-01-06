@@ -12,7 +12,7 @@
 //! - Network bridging (Serial ↔ TCP)
 //! - Virtual COM ports
 //! - Session profiles
-//! - File transfer (XMODEM/YMODEM/ZMODEM)
+//! - File transfer (XMODEM/YMODEM/ZMODEM/Kermit)
 //! - Macro recording and playback
 //! - Transport capability registry
 //! - Packet abstraction layer
@@ -30,9 +30,13 @@
 //! - Collaborative features
 //! - External API (REST/WebSocket)
 //! - Quick macros (M1-M24)
+//! - Batch operations
+//! - Workspace save/restore
 
 pub mod adaptive;
 pub mod arbitration;
+pub mod batch;
+pub mod bluetooth;
 pub mod bridge;
 pub mod capability;
 pub mod chart;
@@ -42,6 +46,7 @@ pub mod deterministic;
 pub mod experiment;
 pub mod explain;
 pub mod external_api;
+pub mod file_transfer;
 pub mod fuzzing;
 pub mod knowledge;
 pub mod logger;
@@ -64,4 +69,5 @@ pub mod transport;
 pub mod trigger;
 pub mod vault;
 pub mod virtual_port;
+pub mod workspace;
 

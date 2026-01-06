@@ -248,12 +248,12 @@ impl SftpPanel {
     pub fn render(&mut self, ui: &mut egui::Ui) {
         // Toolbar
         ui.horizontal(|ui| {
-            ui.label(RichText::new("📁").size(16.0));
+            ui.label(RichText::new("[DIR]").size(16.0));
             ui.label(RichText::new("SFTP File Browser").strong());
             
             ui.separator();
             
-            if ui.button("🔄 Refresh").clicked() {
+            if ui.button("Refresh").clicked() {
                 self.refresh_local();
             }
             
@@ -292,10 +292,10 @@ impl SftpPanel {
         if let Some(ref transfer) = self.transfer {
             ui.horizontal(|ui| {
                 let status_icon = match transfer.status {
-                    TransferStatus::Uploading => "⬆",
-                    TransferStatus::Downloading => "⬇",
-                    TransferStatus::Complete => "✓",
-                    TransferStatus::Error(_) => "✕",
+                    TransferStatus::Uploading => "^",
+                    TransferStatus::Downloading => "v",
+                    TransferStatus::Complete => "OK",
+                    TransferStatus::Error(_) => "X",
                     TransferStatus::Idle => "",
                 };
                 ui.label(status_icon);
@@ -360,7 +360,7 @@ impl SftpPanel {
                 
                 // Action buttons
                 ui.horizontal(|ui| {
-                    if ui.button("⬆ Upload").on_hover_text("Upload selected to remote").clicked() {
+                    if ui.button("Upload").on_hover_text("Upload selected to remote").clicked() {
                         // Upload logic
                     }
                 });
@@ -424,13 +424,13 @@ impl SftpPanel {
                     
                     // Action buttons
                     ui.horizontal(|ui| {
-                        if ui.button("⬇ Download").on_hover_text("Download selected to local").clicked() {
+                        if ui.button("Download").on_hover_text("Download selected to local").clicked() {
                             // Download logic
                         }
                         if ui.button("🗑 Delete").on_hover_text("Delete selected").clicked() {
                             // Delete logic
                         }
-                        if ui.button("📁 New Folder").clicked() {
+                        if ui.button("New Folder").clicked() {
                             // Create folder
                         }
                     });

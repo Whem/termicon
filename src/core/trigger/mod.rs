@@ -1,10 +1,23 @@
 //! Trigger system for automated responses and alerts
 //!
-//! Triggers can match patterns in incoming data and perform actions
+//! Provides:
+//! - Single pattern triggers
+//! - Multi-pattern groups
+//! - Conditional triggers
+//! - Trigger chains
+
+pub mod advanced;
 
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
+// Re-export advanced types
+pub use advanced::{
+    TriggerContext, AdvancedTriggerManager,
+    PatternGroup, PatternDefinition, PatternType, PatternMatchMode,
+    TriggerChain, ChainStep, ChainTimeoutAction, SequenceState,
+};
 
 /// Trigger condition type
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -330,6 +343,27 @@ impl Default for TriggerManager {
     }
 }
 
+/// Alias for pattern group (trigger group)
+pub type TriggerGroup = PatternGroup;
+
+/// Scope for triggers
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum TriggerScope {
+    /// Global - applies to all sessions
+    Global,
+    /// Session - applies to specific session
+    Session,
+    /// Profile - applies to sessions with specific profile
+    Profile,
+}
+
+/// Conditional trigger from advanced module
+pub use advanced::TriggerCondition as AdvancedCondition;
+pub use advanced::ConditionOperator as ConditionType;
+
+/// Re-export ConditionalTrigger
+pub type ConditionalTrigger = advanced::PatternGroup;
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -370,5 +404,3 @@ mod tests {
         assert!(cond.matches(b"ERROR occurred").is_none());
     }
 }
-
-

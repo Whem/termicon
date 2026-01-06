@@ -61,6 +61,14 @@ pub fn get_locale() -> Locale {
 /// Set current locale
 pub fn set_locale(locale: Locale) {
     *CURRENT_LOCALE.write() = locale;
+    // Set the locale in rust-i18n
+    rust_i18n::set_locale(locale.code());
+    tracing::info!("Locale changed to: {}", locale.code());
+}
+
+/// Force locale refresh - call this if UI doesn't update
+pub fn refresh_locale() {
+    let locale = get_locale();
     rust_i18n::set_locale(locale.code());
 }
 
@@ -173,6 +181,7 @@ pub mod keys {
     pub const ERROR_TIMEOUT: &str = "error.timeout";
     pub const ERROR_SEND_FAILED: &str = "error.send_failed";
 }
+
 
 
 

@@ -7,16 +7,19 @@
 //! - Screen buffer management
 //! - Scrolling regions
 //! - Mouse reporting
+//! - Sixel graphics
 
 mod parser;
 mod screen;
 mod cell;
 mod color;
+pub mod sixel;
 
 pub use parser::{AnsiParser, AnsiEvent};
 pub use screen::{Screen, ScreenMode};
 pub use cell::{Cell, CellStyle};
 pub use color::{Color, NamedColor};
+pub use sixel::{SixelEncoder, SixelImage, SixelParser, SixelColor};
 
 /// Terminal size
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

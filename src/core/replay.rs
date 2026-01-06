@@ -29,6 +29,54 @@ pub enum ReplayEvent {
     Marker(String),
     /// Configuration change
     ConfigChange(String),
+    /// Bookmark with label
+    Bookmark { label: String, color: Option<String> },
+    /// Named checkpoint for navigation
+    Checkpoint { name: String, description: Option<String> },
+    /// Protocol-specific event
+    Protocol { name: String, data: serde_json::Value },
+}
+
+/// Event marker for session replay
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EventMarker {
+    /// Marker ID
+    pub id: String,
+    /// Marker type
+    pub marker_type: MarkerType,
+    /// Event index this marker is attached to
+    pub event_index: usize,
+    /// Offset in microseconds
+    pub offset_us: u64,
+    /// Label/description
+    pub label: String,
+    /// Color (hex)
+    pub color: String,
+    /// User notes
+    pub notes: Option<String>,
+}
+
+/// Marker types for replay
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+pub enum MarkerType {
+    /// Generic marker
+    Generic,
+    /// Error/issue marker
+    Error,
+    /// Warning marker  
+    Warning,
+    /// Success/checkpoint marker
+    Success,
+    /// Information marker
+    Info,
+    /// Start of a region
+    RegionStart,
+    /// End of a region
+    RegionEnd,
+    /// Protocol event
+    Protocol,
+    /// User-defined
+    Custom,
 }
 
 /// A single recorded event with timing
@@ -67,7 +115,7 @@ pub struct SessionRecording {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct RecordingMetadata {
     /// Recording name/title
-    pub name: String,
+    pub name: Option<String>,
     /// Description
     pub description: String,
     /// Tags for organization
@@ -78,6 +126,86 @@ pub struct RecordingMetadata {
     pub firmware_version: Option<String>,
     /// User notes
     pub notes: String,
+}
+
+/// Export format for session recordings
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ExportFormat {
+    /// JSON format
+    Json,
+    /// CSV format
+    Csv,
+    /// Human-readable text
+    Text,
+    /// Hex dump format
+    Hex,
+    /// Wireshark PCAP format
+    Wireshark,
+}
+
+impl ExportFormat {
+    /// Get file extension
+    pub fn extension(&self) -> &str {
+        match self {
+            Self::Json => "json",
+            Self::Csv => "csv",
+            Self::Text => "txt",
+            Self::Hex => "hex",
+            Self::Wireshark => "pcap",
+        }
+    }
+    
+    /// Get MIME type
+    pub fn mime_type(&self) -> &str {
+        match self {
+            Self::Json => "application/json",
+            Self::Csv => "text/csv",
+            Self::Text => "text/plain",
+            Self::Hex => "text/plain",
+            Self::Wireshark => "application/vnd.tcpdump.pcap",
+        }
+    }
+}
+
+/// Format data as hex dump
+fn format_hex_dump(data: &[u8]) -> String {
+    let mut result = String::new();
+    
+    for (i, chunk) in data.chunks(16).enumerate() {
+        // Address
+        result.push_str(&format!("{:08X}  ", i * 16));
+        
+        // Hex bytes
+        for (j, byte) in chunk.iter().enumerate() {
+            if j == 8 {
+                result.push(' ');
+            }
+            result.push_str(&format!("{:02X} ", byte));
+        }
+        
+        // Padding
+        if chunk.len() < 16 {
+            for j in chunk.len()..16 {
+                if j == 8 {
+                    result.push(' ');
+                }
+                result.push_str("   ");
+            }
+        }
+        
+        // ASCII
+        result.push_str(" |");
+        for byte in chunk {
+            if *byte >= 0x20 && *byte < 0x7F {
+                result.push(*byte as char);
+            } else {
+                result.push('.');
+            }
+        }
+        result.push_str("|\n");
+    }
+    
+    result
 }
 
 impl SessionRecording {
@@ -92,6 +220,229 @@ impl SessionRecording {
             events: Vec::new(),
             metadata: RecordingMetadata::default(),
         }
+    }
+    
+    /// Get all markers
+    pub fn markers(&self) -> Vec<EventMarker> {
+        let mut markers = Vec::new();
+        for (idx, event) in self.events.iter().enumerate() {
+            match &event.event {
+                ReplayEvent::Marker(label) => {
+                    markers.push(EventMarker {
+                        id: format!("marker_{}", idx),
+                        marker_type: MarkerType::Generic,
+                        event_index: idx,
+                        offset_us: event.offset_us,
+                        label: label.clone(),
+                        color: "#4CAF50".to_string(),
+                        notes: None,
+                    });
+                }
+                ReplayEvent::Bookmark { label, color } => {
+                    markers.push(EventMarker {
+                        id: format!("bookmark_{}", idx),
+                        marker_type: MarkerType::Info,
+                        event_index: idx,
+                        offset_us: event.offset_us,
+                        label: label.clone(),
+                        color: color.clone().unwrap_or_else(|| "#2196F3".to_string()),
+                        notes: None,
+                    });
+                }
+                ReplayEvent::Checkpoint { name, description } => {
+                    markers.push(EventMarker {
+                        id: format!("checkpoint_{}", idx),
+                        marker_type: MarkerType::Success,
+                        event_index: idx,
+                        offset_us: event.offset_us,
+                        label: name.clone(),
+                        color: "#8BC34A".to_string(),
+                        notes: description.clone(),
+                    });
+                }
+                ReplayEvent::Error(msg) => {
+                    markers.push(EventMarker {
+                        id: format!("error_{}", idx),
+                        marker_type: MarkerType::Error,
+                        event_index: idx,
+                        offset_us: event.offset_us,
+                        label: msg.clone(),
+                        color: "#F44336".to_string(),
+                        notes: None,
+                    });
+                }
+                _ => {}
+            }
+        }
+        markers
+    }
+    
+    /// Get checkpoints for navigation
+    pub fn checkpoints(&self) -> Vec<(usize, String, Duration)> {
+        self.events.iter().enumerate()
+            .filter_map(|(idx, e)| {
+                if let ReplayEvent::Checkpoint { name, .. } = &e.event {
+                    Some((idx, name.clone(), Duration::from_micros(e.offset_us)))
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
+    
+    /// Export to different formats
+    pub fn export(&self, format: ExportFormat) -> Result<Vec<u8>, String> {
+        match format {
+            ExportFormat::Json => {
+                serde_json::to_vec_pretty(self)
+                    .map_err(|e| format!("JSON export error: {}", e))
+            }
+            ExportFormat::Csv => {
+                Ok(self.export_csv().into_bytes())
+            }
+            ExportFormat::Text => {
+                Ok(self.export_text().into_bytes())
+            }
+            ExportFormat::Hex => {
+                Ok(self.export_hex().into_bytes())
+            }
+            ExportFormat::Wireshark => {
+                Ok(self.export_pcap())
+            }
+        }
+    }
+    
+    /// Export as CSV
+    fn export_csv(&self) -> String {
+        let mut csv = String::from("timestamp,offset_us,delta_us,direction,type,data_hex,data_text\n");
+        
+        for event in &self.events {
+            let (direction, event_type, data_hex, data_text) = match &event.event {
+                ReplayEvent::Tx(data) => ("TX", "data", hex::encode(data), String::from_utf8_lossy(data).to_string()),
+                ReplayEvent::Rx(data) => ("RX", "data", hex::encode(data), String::from_utf8_lossy(data).to_string()),
+                ReplayEvent::Connected => ("", "connected", String::new(), String::new()),
+                ReplayEvent::Disconnected => ("", "disconnected", String::new(), String::new()),
+                ReplayEvent::Error(msg) => ("", "error", String::new(), msg.clone()),
+                ReplayEvent::Marker(msg) => ("", "marker", String::new(), msg.clone()),
+                ReplayEvent::ConfigChange(cfg) => ("", "config", String::new(), cfg.clone()),
+                ReplayEvent::Bookmark { label, .. } => ("", "bookmark", String::new(), label.clone()),
+                ReplayEvent::Checkpoint { name, .. } => ("", "checkpoint", String::new(), name.clone()),
+                ReplayEvent::Protocol { name, data } => ("", "protocol", String::new(), format!("{}: {}", name, data)),
+            };
+            
+            csv.push_str(&format!(
+                "{},{},{},{},{},\"{}\",\"{}\"\n",
+                event.timestamp.format("%Y-%m-%d %H:%M:%S%.3f"),
+                event.offset_us,
+                event.delta_us,
+                direction,
+                event_type,
+                data_hex,
+                data_text.replace('"', "\"\"").replace('\n', "\\n").replace('\r', "\\r")
+            ));
+        }
+        
+        csv
+    }
+    
+    /// Export as readable text
+    fn export_text(&self) -> String {
+        let mut text = format!(
+            "Session Recording: {}\n",
+            self.metadata.name.clone().unwrap_or_else(|| "Untitled".to_string())
+        );
+        text.push_str(&format!("Connection: {} - {}\n", self.connection_type, self.connection_info));
+        text.push_str(&format!("Started: {}\n", self.start_time.format("%Y-%m-%d %H:%M:%S")));
+        if let Some(end) = self.end_time {
+            text.push_str(&format!("Ended: {}\n", end.format("%Y-%m-%d %H:%M:%S")));
+        }
+        text.push_str(&format!("Events: {}\n", self.events.len()));
+        text.push_str(&format!("TX: {} bytes, RX: {} bytes\n\n", self.tx_bytes(), self.rx_bytes()));
+        text.push_str("=" .repeat(80).as_str());
+        text.push('\n');
+        
+        for event in &self.events {
+            let time_str = format!("[{:.3}s]", event.offset_us as f64 / 1_000_000.0);
+            match &event.event {
+                ReplayEvent::Tx(data) => {
+                    text.push_str(&format!("{} TX: {}\n", time_str, String::from_utf8_lossy(data)));
+                }
+                ReplayEvent::Rx(data) => {
+                    text.push_str(&format!("{} RX: {}\n", time_str, String::from_utf8_lossy(data)));
+                }
+                ReplayEvent::Connected => {
+                    text.push_str(&format!("{} --- CONNECTED ---\n", time_str));
+                }
+                ReplayEvent::Disconnected => {
+                    text.push_str(&format!("{} --- DISCONNECTED ---\n", time_str));
+                }
+                ReplayEvent::Error(msg) => {
+                    text.push_str(&format!("{} ERROR: {}\n", time_str, msg));
+                }
+                ReplayEvent::Marker(msg) => {
+                    text.push_str(&format!("{} [MARKER] {}\n", time_str, msg));
+                }
+                ReplayEvent::Checkpoint { name, description } => {
+                    text.push_str(&format!("{} [CHECKPOINT: {}] {}\n", time_str, name, description.as_deref().unwrap_or("")));
+                }
+                _ => {}
+            }
+        }
+        
+        text
+    }
+    
+    /// Export as hex dump
+    fn export_hex(&self) -> String {
+        let mut hex = String::new();
+        
+        for event in &self.events {
+            let time_str = format!("[{:.3}s]", event.offset_us as f64 / 1_000_000.0);
+            match &event.event {
+                ReplayEvent::Tx(data) | ReplayEvent::Rx(data) => {
+                    let dir = if matches!(&event.event, ReplayEvent::Tx(_)) { "TX" } else { "RX" };
+                    hex.push_str(&format!("{} {} ({} bytes):\n", time_str, dir, data.len()));
+                    hex.push_str(&format_hex_dump(data));
+                    hex.push('\n');
+                }
+                _ => {}
+            }
+        }
+        
+        hex
+    }
+    
+    /// Export as PCAP format (Wireshark compatible)
+    fn export_pcap(&self) -> Vec<u8> {
+        let mut pcap = Vec::new();
+        
+        // PCAP global header
+        pcap.extend_from_slice(&0xA1B2C3D4u32.to_le_bytes()); // Magic
+        pcap.extend_from_slice(&2u16.to_le_bytes()); // Major version
+        pcap.extend_from_slice(&4u16.to_le_bytes()); // Minor version
+        pcap.extend_from_slice(&0i32.to_le_bytes()); // Timezone
+        pcap.extend_from_slice(&0u32.to_le_bytes()); // Sigfigs
+        pcap.extend_from_slice(&65535u32.to_le_bytes()); // Snaplen
+        pcap.extend_from_slice(&147u32.to_le_bytes()); // Network (user-defined)
+        
+        // Packets
+        for event in &self.events {
+            if let ReplayEvent::Tx(data) | ReplayEvent::Rx(data) = &event.event {
+                let ts_sec = event.offset_us / 1_000_000;
+                let ts_usec = event.offset_us % 1_000_000;
+                
+                // Packet header
+                pcap.extend_from_slice(&(ts_sec as u32).to_le_bytes());
+                pcap.extend_from_slice(&(ts_usec as u32).to_le_bytes());
+                pcap.extend_from_slice(&(data.len() as u32).to_le_bytes());
+                pcap.extend_from_slice(&(data.len() as u32).to_le_bytes());
+                
+                // Packet data
+                pcap.extend_from_slice(data);
+            }
+        }
+        
+        pcap
     }
 
     /// Get total duration
@@ -256,6 +607,30 @@ impl SessionRecorder {
     /// Add marker
     pub fn add_marker(&mut self, note: &str) {
         self.record(ReplayEvent::Marker(note.to_string()));
+    }
+    
+    /// Add bookmark with optional color
+    pub fn add_bookmark(&mut self, label: &str, color: Option<&str>) {
+        self.record(ReplayEvent::Bookmark { 
+            label: label.to_string(), 
+            color: color.map(|s| s.to_string()) 
+        });
+    }
+    
+    /// Add checkpoint for navigation
+    pub fn add_checkpoint(&mut self, name: &str, description: Option<&str>) {
+        self.record(ReplayEvent::Checkpoint { 
+            name: name.to_string(), 
+            description: description.map(|s| s.to_string()) 
+        });
+    }
+    
+    /// Record protocol event
+    pub fn record_protocol_event(&mut self, protocol: &str, data: serde_json::Value) {
+        self.record(ReplayEvent::Protocol { 
+            name: protocol.to_string(), 
+            data 
+        });
     }
 
     /// Finish recording
@@ -458,6 +833,7 @@ mod tests {
         assert!(is_last);
     }
 }
+
 
 
 

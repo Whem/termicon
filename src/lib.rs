@@ -4,7 +4,8 @@
 //! - Serial ports (RS-232, RS-485, USB-Serial adapters)
 //! - TCP/IP connections
 //! - Telnet protocol
-//! - SSH (future)
+//! - SSH-2 (libssh2)
+//! - Bluetooth (BLE/SPP)
 //!
 //! ## Features
 //!
@@ -15,6 +16,7 @@
 //! - Scripting support (Lua)
 //! - Plugin architecture
 //! - Internationalization (i18n)
+//! - CLI with exit codes and pipe support
 //!
 //! ## Example
 //!
@@ -44,12 +46,14 @@
 // Initialize i18n - load translations from locales folder
 rust_i18n::i18n!("locales", fallback = "en");
 
+pub mod cli;
 pub mod config;
 pub mod core;
 pub mod i18n;
 pub mod utils;
 
 // Re-exports for convenience
+pub use crate::cli::{CliResult, ExitCodes, PipeMode, OutputFormat};
 pub use crate::config::{AppConfig, ConnectionProfile};
 pub use crate::core::codec::{Codec, CodecType};
 pub use crate::core::logger::{LogEntry, Logger, LogFormat};
@@ -58,7 +62,7 @@ pub use crate::core::transport::{
     SerialConfig, SerialFlowControl, SshAuth, SshConfig, TcpConfig, TelnetConfig, Transport,
     TransportType,
 };
-pub use crate::core::trigger::{Trigger, TriggerAction, TriggerCondition};
+pub use crate::core::trigger::{Trigger, TriggerAction, TriggerCondition, TriggerManager, TriggerScope};
 pub use crate::i18n::{get_locale, set_locale, t, Locale};
 pub use crate::utils::autoconnect::{AutoConnect, AutoConnectConfig};
 

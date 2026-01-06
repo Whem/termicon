@@ -19,6 +19,7 @@ Termicon is a comprehensive serial port and network terminal application built i
 - 256-color and true color support
 - Full cursor control and screen manipulation
 - Mouse reporting (SGR mode)
+- Sixel graphics support
 
 ### Data Processing
 - **Hex/ASCII/Mixed views** - Multiple data display formats
@@ -35,6 +36,7 @@ Termicon is a comprehensive serial port and network terminal application built i
 - **XMODEM** - 128 byte and 1K variants with CRC
 - **YMODEM** - Batch mode with file info
 - **ZMODEM** - Auto-start, streaming transfer
+- **Kermit** - Full protocol with quoting and checksums
 - **SFTP** - Secure file transfer over SSH
 
 ### Advanced Features
@@ -43,23 +45,28 @@ Termicon is a comprehensive serial port and network terminal application built i
 - **Profiles** - Save and load connection configurations
 - **Macros (M1-M24)** - Quick macro buttons like classic terminals
 - **Commands** - Profile-specific command history sorted by usage
-- **Triggers** - Pattern matching with auto-response
+- **Triggers** - Pattern matching with auto-response, multi-pattern groups, trigger chains
 - **Session Logging** - Configurable log formats
-- **Real-time Charts** - Data visualization for sensor values
+- **Real-time Charts** - Data visualization with markers and PNG/SVG export
 - **Deterministic Mode** - Reproducible test runs
-- **Fuzzing/Testing** - Protocol robustness testing
+- **Fuzzing/Testing** - Packet/timing fuzzing for robustness testing
 - **Adaptive Automation** - Feedback control rules
 - **External API** - REST/WebSocket control
+- **Batch Operations** - Multi-session commands with parallel execution
+- **Workspace** - Save and restore complete session states
 
 ### User Interface
-- Modern dark/light themes
-- Tab-based multi-session support
+- Modern dark/light themes with 12+ color schemes
+- Tab-based multi-session support with split views
 - Side panel with profiles, commands, history, charts
-- Keyboard shortcuts (F1-F12 for macros)
+- Comprehensive keyboard shortcuts (F1-F24 for macros)
+- Command palette (Ctrl+K) for quick access
 - Multi-language support (English, Hungarian)
 - SFTP file browser
 - Real-time search in output
 - Macro recording and playback
+- High contrast mode and font scaling for accessibility
+- Font configuration UI
 
 ## 🚀 Installation
 
@@ -103,28 +110,38 @@ Key dependencies include:
 
 | Key | Action |
 |-----|--------|
+| Ctrl+K | Command palette |
 | Ctrl+T | New tab |
 | Ctrl+W | Close tab |
 | Ctrl+D | Disconnect |
-| Ctrl+Shift+C | Copy |
-| Ctrl+Shift+V | Paste |
-| F1-F12 | Execute snippets |
+| Ctrl+L | Clear screen |
+| Ctrl+F | Search |
+| F1-F12 | Execute M1-M12 macros |
+| Shift+F1-F12 | Execute M13-M24 macros |
 
 ### CLI Mode
 
 ```bash
 # List serial ports
-termicon list-ports
+termicon-cli list-ports
 
 # Connect to serial port
-termicon serial --port COM3 --baud 115200
+termicon-cli serial --port COM3 --baud 115200
 
 # Connect via TCP
-termicon tcp --host 192.168.1.100 --port 23
+termicon-cli tcp --host 192.168.1.100 --port 23
 
 # Connect via SSH
-termicon ssh --host example.com --user admin
+termicon-cli ssh --host example.com --user admin
+
+# Pipe support (stdin/stdout)
+echo "AT" | termicon-cli serial --port COM3
+
+# JSON output for scripting
+termicon-cli serial --port COM3 --output-format json
 ```
+
+Exit codes are standardized for scripting (0=success, 3=connection failed, etc.).
 
 ## 📁 Project Structure
 
@@ -207,18 +224,35 @@ MIT License - see LICENSE file for details.
 | TCP/IP | ✅ Complete |
 | Telnet | ✅ Complete |
 | SSH | ✅ Complete |
-| Terminal Emulation | ✅ Complete (VT100/VT220, 256+true color, mouse) |
-| Modbus | ✅ Complete (RTU/TCP) |
-| XMODEM/YMODEM | ✅ Complete |
-| ZMODEM | ✅ Complete |
+| Terminal Emulation | ✅ Complete (VT100/VT220, 256+true color, mouse, sixel) |
+| Modbus | ✅ Complete (RTU/TCP with monitoring) |
+| NMEA 0183 | ✅ Complete (GPS/navigation sentences) |
+| XMODEM/YMODEM/ZMODEM | ✅ Complete |
+| Kermit | ✅ Complete |
 | Bridge | ✅ Complete |
 | Virtual Ports | ✅ Complete |
 | Profiles | ✅ Complete |
-| Snippets/Macros | ✅ Complete |
-| Triggers | ✅ Complete |
-| Charts | ✅ Complete |
+| Snippets/Macros | ✅ Complete (M1-M24) |
+| Triggers | ✅ Complete (chains, multi-pattern) |
+| Charts | ✅ Complete (markers, PNG/SVG export) |
 | SFTP Browser | ✅ Complete |
 | Macro Recording | ✅ Complete |
-| Dark/Light Themes | ✅ Complete |
-| Search in Output | ✅ Complete |
+| Dark/Light Themes | ✅ Complete (12+ schemes) |
+| Split Views | ✅ Complete |
+| Command Palette | ✅ Complete |
+| Keyboard Navigation | ✅ Complete |
+| Accessibility | ✅ Complete (high contrast, font scaling) |
+| Batch Operations | ✅ Complete |
+| Workspace Save/Restore | ✅ Complete |
+| CLI Pipe Support | ✅ Complete |
 | Bluetooth LE | ✅ Complete (GATT, NUS) |
+
+**Overall Completion: ~85%**
+
+### Recent Fixes (v0.1.1)
+- Language switching now works properly
+- Fixed emoji characters showing as squares
+- Profile double-click connects directly
+- Command double-click inserts into input field
+
+See [ROADMAP.md](docs/ROADMAP.md) for detailed progress.

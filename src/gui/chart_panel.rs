@@ -238,7 +238,7 @@ impl ChartPanel {
     pub fn render(&mut self, ui: &mut egui::Ui) {
         // Toolbar
         ui.horizontal(|ui| {
-            ui.label(RichText::new("📊").size(16.0));
+            ui.label(RichText::new("[~]").size(16.0));
             ui.label(RichText::new("Chart View").strong());
             
             ui.separator();
@@ -408,6 +408,7 @@ mod tests {
         assert!(panel.channels[0].data.len() == 2);
     }
 }
+
 
 
 

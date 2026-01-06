@@ -45,6 +45,9 @@ fn main() -> eframe::Result<()> {
         )
         .init();
 
+    // Set default locale to English
+    rust_i18n::set_locale("en");
+
     tracing::info!("Starting Termicon v{}", env!("CARGO_PKG_VERSION"));
 
     // Load application icon

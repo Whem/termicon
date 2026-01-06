@@ -152,7 +152,7 @@ impl ConnectionDialog {
                             }
                         });
 
-                    if ui.button("🔄").clicked() {
+                    if ui.button("R").on_hover_text("Refresh ports").clicked() {
                         self.refresh_ports();
                     }
                 });
@@ -342,6 +342,7 @@ impl Default for ConnectionDialog {
         Self::new()
     }
 }
+
 
 
 
