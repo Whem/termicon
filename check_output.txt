@@ -1,0 +1,1100 @@
+﻿cargo :     Checking termicon v0.1.0 (D:\work\termicon)
+At C:\Users\szabi\AppData\Local\Temp\ps-script-d8957dca-a754-4165-b25c-383b0847b7bd.ps1:82 char:67
++ ... SERPROFILE\.cargo\bin"; cd D:\work\termicon; cargo check 2>&1 | Out-F ...
++                                                  ~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (    Checking te...\work\termicon):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+warning: unused imports: `SerialFlowControl` and `SerialParity`
+ --> src\config\settings.rs:5:44
+  |
+5 | use crate::core::transport::{SerialConfig, SerialFlowControl, SerialParity, TcpConfig, TelnetConfig};
+  |                                            ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `bytes::Bytes`
+  --> src\core\bridge\mod.rs:10:5
+   |
+10 | use bytes::Bytes;
+   |     ^^^^^^^^^^^^
+
+warning: unused import: `std::collections::VecDeque`
+  --> src\core\chart\mod.rs:16:5
+   |
+16 | use std::collections::VecDeque;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Duration`
+  --> src\core\chart\mod.rs:17:17
+   |
+17 | use std::time::{Duration, Instant};
+   |                 ^^^^^^^^
+
+warning: unused import: `Read`
+  --> src\core\protocol\modbus.rs:10:15
+   |
+10 | use std::io::{Read, Write};
+   |               ^^^^
+
+warning: unused imports: `BytesMut` and `Bytes`
+ --> src\core\protocol\framing.rs:3:13
+  |
+3 | use bytes::{Bytes, BytesMut};
+  |             ^^^^^  ^^^^^^^^
+
+warning: unused import: `std::collections::VecDeque`
+ --> src\core\protocol\framing.rs:4:5
+  |
+4 | use std::collections::VecDeque;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `TriggerAction`
+ --> src\core\session.rs:8:37
+  |
+8 | use crate::core::trigger::{Trigger, TriggerAction};
+  |                                     ^^^^^^^^^^^^^
+
+warning: unused import: `Read`
+  --> src\core\virtual_port\mod.rs:10:15
+   |
+10 | use std::io::{Read, Write};
+   |               ^^^^
+
+warning: unused import: `SessionState`
+ --> src\utils\autoconnect.rs:6:37
+  |
+6 | use crate::core::session::{Session, SessionState};
+  |                                     ^^^^^^^^^^^^
+
+warning: unused import: `Write`
+  --> src\core\protocol\modbus.rs:10:21
+   |
+10 | use std::io::{Read, Write};
+   |                     ^^^^^
+
+warning: unused import: `Write`
+  --> src\core\virtual_port\mod.rs:10:21
+   |
+10 | use std::io::{Read, Write};
+   |                     ^^^^^
+
+warning: unused variable: `i`
+   --> src\core\chart\parser.rs:161:14
+    |
+161 |         for (i, part) in parts.iter().enumerate() {
+    |              ^ help: if this is intentional, prefix it with an underscore: `_i`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `addr` and `port` are never read
+   --> src\core\bridge\mod.rs:434:5
+    |
+432 | pub struct Rfc2217Server {
+    |            ------------- fields in this struct
+433 |     /// Listen address
+434 |     addr: String,
+    |     ^^^^
+435 |     /// Port
+436 |     port: u16,
+    |     ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `ColorScheme` is never constructed
+   --> src\core\terminal\color.rs:150:12
+    |
+150 | pub struct ColorScheme {
+    |            ^^^^^^^^^^^
+
+warning: function `list_ports` is never used
+   --> src\core\transport\serial.rs:363:8
+    |
+363 | pub fn list_ports() -> Result<Vec<serialport::SerialPortInfo>, TransportError> {
+    |        ^^^^^^^^^^
+
+warning: field `handle` is never read
+  --> src\core\virtual_port\mod.rs:39:5
+   |
+30 | pub struct VirtualPortPair {
+   |            --------------- field in this struct
+...
+39 |     handle: Option<VirtualPortHandle>,
+   |     ^^^^^^
+   |
+   = note: `VirtualPortPair` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead co
+de analysis
+
+warning: field `pipe_name` is never read
+  --> src\core\virtual_port\mod.rs:52:5
+   |
+51 | struct VirtualPortHandle {
+   |        ----------------- field in this struct
+52 |     pipe_name: String,
+   |     ^^^^^^^^^
+   |
+   = note: `VirtualPortHandle` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead 
+code analysis
+
+warning: missing documentation for a method
+   --> src\core\chart\mod.rs:218:5
+    |
+218 |     pub fn is_paused(&self) -> bool {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+note: the lint level is defined here
+   --> src\lib.rs:39:9
+    |
+ 39 | #![warn(missing_docs)]
+    |         ^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\protocol\modbus.rs:17:5
+   |
+17 |     Io(#[from] std::io::Error),
+   |     ^^
+
+warning: missing documentation for a variant
+  --> src\core\protocol\modbus.rs:20:5
+   |
+20 |     CrcError,
+   |     ^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\protocol\modbus.rs:23:5
+   |
+23 |     InvalidResponse,
+   |     ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\protocol\modbus.rs:26:5
+   |
+26 |     Timeout,
+   |     ^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\protocol\modbus.rs:29:5
+   |
+29 |     Exception(ModbusException),
+   |     ^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\protocol\modbus.rs:32:5
+   |
+32 |     InvalidAddress,
+   |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\protocol\modbus.rs:35:5
+   |
+35 |     InvalidData,
+   |     ^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> src\core\protocol\framing.rs:427:5
+    |
+427 |     pub stx: u8,
+    |     ^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> src\core\protocol\framing.rs:428:5
+    |
+428 |     pub etx: u8,
+    |     ^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\core\protocol\checksum.rs:42:5
+   |
+42 |     pub polynomial: u16,
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\core\protocol\checksum.rs:43:5
+   |
+43 |     pub initial: u16,
+   |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\core\protocol\checksum.rs:44:5
+   |
+44 |     pub xor_out: u16,
+   |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\core\protocol\checksum.rs:45:5
+   |
+45 |     pub reflect_in: bool,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\core\protocol\checksum.rs:46:5
+   |
+46 |     pub reflect_out: bool,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> src\core\protocol\checksum.rs:150:5
+    |
+150 |     pub polynomial: u32,
+    |     ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> src\core\protocol\checksum.rs:151:5
+    |
+151 |     pub initial: u32,
+    |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> src\core\protocol\checksum.rs:152:5
+    |
+152 |     pub xor_out: u32,
+    |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> src\core\protocol\checksum.rs:153:5
+    |
+153 |     pub reflect_in: bool,
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> src\core\protocol\checksum.rs:154:5
+    |
+154 |     pub reflect_out: bool,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\core\terminal\parser.rs:26:9
+   |
+26 |         params: Vec<u16>,
+   |         ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\core\terminal\parser.rs:27:9
+   |
+27 |         intermediates: Vec<u8>,
+   |         ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\core\terminal\parser.rs:28:9
+   |
+28 |         action: u8,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\core\terminal\parser.rs:32:9
+   |
+32 |         intermediates: Vec<u8>,
+   |         ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\core\terminal\parser.rs:33:9
+   |
+33 |         action: u8,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\core\terminal\parser.rs:37:9
+   |
+37 |         params: Vec<Vec<u8>>,
+   |         ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\screen.rs:10:5
+   |
+10 |     Normal,
+   |     ^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:267:5
+    |
+267 |     pub fn move_cursor_down(&mut self, n: u16) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:271:5
+    |
+271 |     pub fn move_cursor_left(&mut self, n: u16) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:275:5
+    |
+275 |     pub fn move_cursor_right(&mut self, n: u16) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:279:5
+    |
+279 |     pub fn set_cursor_pos(&mut self, row: u16, col: u16) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:284:5
+    |
+284 |     pub fn set_cursor_row(&mut self, row: u16) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:288:5
+    |
+288 |     pub fn set_cursor_col(&mut self, col: u16) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:303:5
+    |
+303 |     pub fn erase_above(&mut self) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:313:5
+    |
+313 |     pub fn erase_all(&mut self) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:317:5
+    |
+317 |     pub fn erase_scrollback(&mut self) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:321:5
+    |
+321 |     pub fn erase_line_right(&mut self) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:329:5
+    |
+329 |     pub fn erase_line_left(&mut self) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:337:5
+    |
+337 |     pub fn erase_line(&mut self) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:344:5
+    |
+344 |     pub fn erase_chars(&mut self, n: u16) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:364:5
+    |
+364 |     pub fn delete_lines(&mut self, n: u16) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:375:5
+    |
+375 |     pub fn insert_chars(&mut self, n: u16) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:392:5
+    |
+392 |     pub fn delete_chars(&mut self, n: u16) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:414:5
+    |
+414 |     pub fn set_bold(&mut self, v: bool) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:418:5
+    |
+418 |     pub fn set_dim(&mut self, v: bool) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:422:5
+    |
+422 |     pub fn set_italic(&mut self, v: bool) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:426:5
+    |
+426 |     pub fn set_underline(&mut self, v: bool) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:430:5
+    |
+430 |     pub fn set_blink(&mut self, v: bool) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:434:5
+    |
+434 |     pub fn set_inverse(&mut self, v: bool) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:438:5
+    |
+438 |     pub fn set_hidden(&mut self, v: bool) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:442:5
+    |
+442 |     pub fn set_strikethrough(&mut self, v: bool) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:446:5
+    |
+446 |     pub fn set_fg_color(&mut self, color: Color) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:450:5
+    |
+450 |     pub fn set_bg_color(&mut self, color: Color) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:473:5
+    |
+473 |     pub fn restore_cursor(&mut self) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:484:5
+    |
+484 |     pub fn set_auto_wrap(&mut self, v: bool) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:488:5
+    |
+488 |     pub fn set_insert_mode(&mut self, v: bool) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:492:5
+    |
+492 |     pub fn set_newline_mode(&mut self, v: bool) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:496:5
+    |
+496 |     pub fn set_charset(&mut self, charset: u8) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:505:5
+    |
+505 |     pub fn rows(&self) -> u16 {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:509:5
+    |
+509 |     pub fn cursor_pos(&self) -> (u16, u16) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> src\core\terminal\screen.rs:513:5
+    |
+513 |     pub fn cursor_visible(&self) -> bool {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:46:5
+   |
+46 |     Black,
+   |     ^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:47:5
+   |
+47 |     Red,
+   |     ^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:48:5
+   |
+48 |     Green,
+   |     ^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:49:5
+   |
+49 |     Yellow,
+   |     ^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:50:5
+   |
+50 |     Blue,
+   |     ^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:51:5
+   |
+51 |     Magenta,
+   |     ^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:52:5
+   |
+52 |     Cyan,
+   |     ^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:53:5
+   |
+53 |     White,
+   |     ^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:54:5
+   |
+54 |     BrightBlack,
+   |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:55:5
+   |
+55 |     BrightRed,
+   |     ^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:56:5
+   |
+56 |     BrightGreen,
+   |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:57:5
+   |
+57 |     BrightYellow,
+   |     ^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:58:5
+   |
+58 |     BrightBlue,
+   |     ^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:59:5
+   |
+59 |     BrightMagenta,
+   |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:60:5
+   |
+60 |     BrightCyan,
+   |     ^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\terminal\color.rs:61:5
+   |
+61 |     BrightWhite,
+   |     ^^^^^^^^^^^
+
+warning: missing documentation for an enum
+  --> src\core\virtual_port\mod.rs:14:1
+   |
+14 | pub enum VirtualPortError {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\virtual_port\mod.rs:16:5
+   |
+16 |     Io(#[from] std::io::Error),
+   |     ^^
+
+warning: missing documentation for a variant
+  --> src\core\virtual_port\mod.rs:19:5
+   |
+19 |     NotSupported,
+   |     ^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\virtual_port\mod.rs:22:5
+   |
+22 |     CreationFailed(String),
+   |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> src\core\virtual_port\mod.rs:25:5
+   |
+25 |     NotFound(String),
+   |     ^^^^^^^^
+
+warning: missing documentation for an associated function
+   --> src\core\virtual_port\mod.rs:120:5
+    |
+120 |     pub fn create() -> Result<Self, VirtualPortError> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:78:5
+   |
+78 |     pub const APP_NAME: &str = "app.name";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:79:5
+   |
+79 |     pub const APP_VERSION: &str = "app.version";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:82:5
+   |
+82 |     pub const MENU_FILE: &str = "menu.file";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:83:5
+   |
+83 |     pub const MENU_EDIT: &str = "menu.edit";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:84:5
+   |
+84 |     pub const MENU_VIEW: &str = "menu.view";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:85:5
+   |
+85 |     pub const MENU_CONNECTION: &str = "menu.connection";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:86:5
+   |
+86 |     pub const MENU_TOOLS: &str = "menu.tools";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:87:5
+   |
+87 |     pub const MENU_HELP: &str = "menu.help";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:90:5
+   |
+90 |     pub const MENU_NEW_SESSION: &str = "menu.new_session";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:91:5
+   |
+91 |     pub const MENU_OPEN_SESSION: &str = "menu.open_session";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:92:5
+   |
+92 |     pub const MENU_SAVE_SESSION: &str = "menu.save_session";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:93:5
+   |
+93 |     pub const MENU_CLOSE_SESSION: &str = "menu.close_session";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:94:5
+   |
+94 |     pub const MENU_EXIT: &str = "menu.exit";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:97:5
+   |
+97 |     pub const MENU_CONNECT: &str = "menu.connect";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:98:5
+   |
+98 |     pub const MENU_DISCONNECT: &str = "menu.disconnect";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> src\i18n\mod.rs:99:5
+   |
+99 |     pub const MENU_QUICK_CONNECT: &str = "menu.quick_connect";
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:102:5
+    |
+102 |     pub const MENU_TEXT_VIEW: &str = "menu.text_view";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:103:5
+    |
+103 |     pub const MENU_HEX_VIEW: &str = "menu.hex_view";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:104:5
+    |
+104 |     pub const MENU_CHART_VIEW: &str = "menu.chart_view";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:107:5
+    |
+107 |     pub const MENU_SEND_FILE: &str = "menu.send_file";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:108:5
+    |
+108 |     pub const MENU_RECEIVE_FILE: &str = "menu.receive_file";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:109:5
+    |
+109 |     pub const MENU_MACROS: &str = "menu.macros";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:110:5
+    |
+110 |     pub const MENU_TRIGGERS: &str = "menu.triggers";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:111:5
+    |
+111 |     pub const MENU_SETTINGS: &str = "menu.settings";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:114:5
+    |
+114 |     pub const DIALOG_CONNECTION_TYPE: &str = "dialog.connection_type";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:115:5
+    |
+115 |     pub const DIALOG_SERIAL: &str = "dialog.serial";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:116:5
+    |
+116 |     pub const DIALOG_TCP: &str = "dialog.tcp";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:117:5
+    |
+117 |     pub const DIALOG_TELNET: &str = "dialog.telnet";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:118:5
+    |
+118 |     pub const DIALOG_SSH: &str = "dialog.ssh";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:121:5
+    |
+121 |     pub const SERIAL_PORT: &str = "serial.port";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:122:5
+    |
+122 |     pub const SERIAL_BAUD_RATE: &str = "serial.baud_rate";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:123:5
+    |
+123 |     pub const SERIAL_DATA_BITS: &str = "serial.data_bits";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:124:5
+    |
+124 |     pub const SERIAL_STOP_BITS: &str = "serial.stop_bits";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:125:5
+    |
+125 |     pub const SERIAL_PARITY: &str = "serial.parity";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:126:5
+    |
+126 |     pub const SERIAL_FLOW_CONTROL: &str = "serial.flow_control";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:127:5
+    |
+127 |     pub const SERIAL_PARITY_NONE: &str = "serial.parity_none";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:128:5
+    |
+128 |     pub const SERIAL_PARITY_ODD: &str = "serial.parity_odd";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:129:5
+    |
+129 |     pub const SERIAL_PARITY_EVEN: &str = "serial.parity_even";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:130:5
+    |
+130 |     pub const SERIAL_FLOW_NONE: &str = "serial.flow_none";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:131:5
+    |
+131 |     pub const SERIAL_FLOW_HARDWARE: &str = "serial.flow_hardware";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:132:5
+    |
+132 |     pub const SERIAL_FLOW_SOFTWARE: &str = "serial.flow_software";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:135:5
+    |
+135 |     pub const NETWORK_HOST: &str = "network.host";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:136:5
+    |
+136 |     pub const NETWORK_PORT: &str = "network.port";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:137:5
+    |
+137 |     pub const NETWORK_TIMEOUT: &str = "network.timeout";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:140:5
+    |
+140 |     pub const BTN_CONNECT: &str = "btn.connect";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:141:5
+    |
+141 |     pub const BTN_DISCONNECT: &str = "btn.disconnect";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:142:5
+    |
+142 |     pub const BTN_CANCEL: &str = "btn.cancel";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:143:5
+    |
+143 |     pub const BTN_OK: &str = "btn.ok";
+    |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:144:5
+    |
+144 |     pub const BTN_APPLY: &str = "btn.apply";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:145:5
+    |
+145 |     pub const BTN_SAVE: &str = "btn.save";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:146:5
+    |
+146 |     pub const BTN_SEND: &str = "btn.send";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:147:5
+    |
+147 |     pub const BTN_CLEAR: &str = "btn.clear";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:148:5
+    |
+148 |     pub const BTN_REFRESH: &str = "btn.refresh";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:151:5
+    |
+151 |     pub const STATUS_CONNECTED: &str = "status.connected";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:152:5
+    |
+152 |     pub const STATUS_DISCONNECTED: &str = "status.disconnected";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:153:5
+    |
+153 |     pub const STATUS_CONNECTING: &str = "status.connecting";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:154:5
+    |
+154 |     pub const STATUS_ERROR: &str = "status.error";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:155:5
+    |
+155 |     pub const STATUS_BYTES_SENT: &str = "status.bytes_sent";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:156:5
+    |
+156 |     pub const STATUS_BYTES_RECEIVED: &str = "status.bytes_received";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:159:5
+    |
+159 |     pub const LOG_ENABLED: &str = "log.enabled";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:160:5
+    |
+160 |     pub const LOG_FILE: &str = "log.file";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:161:5
+    |
+161 |     pub const LOG_FORMAT: &str = "log.format";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:162:5
+    |
+162 |     pub const LOG_TIMESTAMPS: &str = "log.timestamps";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:165:5
+    |
+165 |     pub const AUTOCONNECT_ENABLED: &str = "autoconnect.enabled";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:166:5
+    |
+166 |     pub const AUTOCONNECT_DELAY: &str = "autoconnect.delay";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:167:5
+    |
+167 |     pub const AUTOCONNECT_MAX_RETRIES: &str = "autoconnect.max_retries";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:170:5
+    |
+170 |     pub const ERROR_CONNECTION_FAILED: &str = "error.connection_failed";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:171:5
+    |
+171 |     pub const ERROR_PORT_NOT_FOUND: &str = "error.port_not_found";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:172:5
+    |
+172 |     pub const ERROR_PERMISSION_DENIED: &str = "error.permission_denied";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:173:5
+    |
+173 |     pub const ERROR_TIMEOUT: &str = "error.timeout";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+   --> src\i18n\mod.rs:174:5
+    |
+174 |     pub const ERROR_SEND_FAILED: &str = "error.send_failed";
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\utils\autoconnect.rs:42:20
+   |
+42 |     Reconnecting { attempt: u32, max: u32 },
+   |                    ^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\utils\autoconnect.rs:42:34
+   |
+42 |     Reconnecting { attempt: u32, max: u32 },
+   |                                  ^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\utils\autoconnect.rs:46:23
+   |
+46 |     ReconnectFailed { error: String },
+   |                       ^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\utils\autoconnect.rs:50:22
+   |
+50 |     DeviceDetected { port: String },
+   |                      ^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> src\utils\autoconnect.rs:52:21
+   |
+52 |     DeviceRemoved { port: String },
+   |                     ^^^^^^^^^^^^
+
+warning: `termicon` (lib) generated 177 warnings (run `cargo fix --lib -p termicon` to apply 11 suggestions)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 3.64s

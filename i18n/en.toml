@@ -1,0 +1,116 @@
+# English translations for Termicon
+
+[app]
+name = "Termicon"
+version = "Version"
+
+[menu]
+file = "File"
+edit = "Edit"
+view = "View"
+connection = "Connection"
+tools = "Tools"
+help = "Help"
+new_session = "New Session"
+open_session = "Open Session..."
+save_session = "Save Session"
+close_session = "Close Session"
+exit = "Exit"
+connect = "Connect"
+disconnect = "Disconnect"
+quick_connect = "Quick Connect..."
+text_view = "Text View"
+hex_view = "Hex View"
+chart_view = "Chart View"
+send_file = "Send File..."
+receive_file = "Receive File..."
+macros = "Macros..."
+triggers = "Triggers..."
+settings = "Settings..."
+
+[dialog]
+connection_type = "Connection Type"
+serial = "Serial Port"
+tcp = "TCP/IP"
+telnet = "Telnet"
+ssh = "SSH"
+
+[serial]
+port = "Port"
+baud_rate = "Baud Rate"
+data_bits = "Data Bits"
+stop_bits = "Stop Bits"
+parity = "Parity"
+flow_control = "Flow Control"
+parity_none = "None"
+parity_odd = "Odd"
+parity_even = "Even"
+flow_none = "None"
+flow_hardware = "Hardware (RTS/CTS)"
+flow_software = "Software (XON/XOFF)"
+
+[network]
+host = "Host"
+port = "Port"
+timeout = "Timeout (seconds)"
+
+[btn]
+connect = "Connect"
+disconnect = "Disconnect"
+cancel = "Cancel"
+ok = "OK"
+apply = "Apply"
+save = "Save"
+send = "Send"
+clear = "Clear"
+refresh = "Refresh"
+
+[status]
+connected = "Connected"
+disconnected = "Disconnected"
+connecting = "Connecting..."
+error = "Error"
+bytes_sent = "TX"
+bytes_received = "RX"
+
+[log]
+enabled = "Enable Logging"
+file = "Log File"
+format = "Format"
+timestamps = "Add Timestamps"
+
+[autoconnect]
+enabled = "Auto-Reconnect"
+delay = "Reconnect Delay (seconds)"
+max_retries = "Max Retries (0 = unlimited)"
+
+[error]
+connection_failed = "Connection failed"
+port_not_found = "Port not found"
+permission_denied = "Permission denied"
+timeout = "Connection timeout"
+send_failed = "Send failed"
+
+[transfer]
+sending = "Sending"
+receiving = "Receiving"
+progress = "Progress"
+speed = "Speed"
+eta = "ETA"
+complete = "Complete"
+cancelled = "Cancelled"
+failed = "Failed"
+
+[terminal]
+local_echo = "Local Echo"
+line_ending = "Line Ending"
+line_ending_cr = "CR"
+line_ending_lf = "LF"
+line_ending_crlf = "CR+LF"
+font_size = "Font Size"
+scroll_on_output = "Scroll on Output"
+
+
+
+
+

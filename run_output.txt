@@ -1,0 +1,9 @@
+﻿cargo : error: `cargo run` could not determine which binary to run. Use the `--bin` option to specify a binary, or the 
+`default-run` manifest key.
+At C:\Users\szabi\AppData\Local\Temp\ps-script-f0742085-05d7-4855-9c68-7775a7ed159f.ps1:7 char:67
++ ... :USERPROFILE\.cargo\bin"; cd D:\work\termicon; cargo run 2>&1 | Out-F ...
++                                                    ~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: `cargo r...` manifest key.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+available binaries: termicon, termicon-cli

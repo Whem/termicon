@@ -1,0 +1,228 @@
+hu:
+  # Alkalmazás
+  app:
+    name: "Termicon"
+    version: "v0.1.0"
+    welcome: "Üdvözöljük a Termicon-ban!"
+  
+  # Menü
+  menu:
+    file: "Fájl"
+    edit: "Szerkesztés"
+    view: "Nézet"
+    connection: "Kapcsolat"
+    tools: "Eszközök"
+    help: "Súgó"
+    new_session: "Új fül"
+    open_session: "Munkamenet megnyitása"
+    save_session: "Munkamenet mentése"
+    close_session: "Fül bezárása"
+    exit: "Kilépés"
+    connect: "Kapcsolódás"
+    disconnect: "Leválasztás"
+    quick_connect: "Gyors kapcsolat"
+    text_view: "Szöveges nézet"
+    hex_view: "Hex nézet"
+    chart_view: "Grafikon nézet"
+    send_file: "Fájl küldése"
+    receive_file: "Fájl fogadása"
+    macros: "Makrók"
+    triggers: "Triggerek"
+    settings: "Beállítások"
+  
+  # Eszköztár
+  toolbar:
+    serial: "Soros"
+    tcp: "TCP"
+    telnet: "Telnet"
+    ssh: "SSH"
+    ble: "BLE"
+    connect: "Kapcsolódás"
+    disconnect: "Leválasztás"
+    clear: "Törlés"
+    save_profile: "Profil mentése"
+    dtr: "DTR"
+    rts: "RTS"
+    timestamps: "Időbélyegek"
+    hex_view: "Hex nézet"
+    local_echo: "Helyi visszhang"
+    send_file: "Fájl küldése"
+    receive_file: "Fájl fogadása"
+  
+  # Kapcsolat dialógusok
+  dialog:
+    connection_type: "Kapcsolat típusa"
+    serial: "Soros port"
+    tcp: "TCP/IP"
+    telnet: "Telnet"
+    ssh: "SSH"
+    bluetooth: "Bluetooth LE"
+    settings: "Beállítások"
+    about: "Névjegy"
+  
+  # Soros beállítások
+  serial:
+    port: "Port"
+    baud_rate: "Sebesség"
+    data_bits: "Adat bitek"
+    stop_bits: "Stop bitek"
+    parity: "Paritás"
+    flow_control: "Folyamszabályozás"
+    parity_none: "Nincs"
+    parity_odd: "Páratlan"
+    parity_even: "Páros"
+    flow_none: "Nincs"
+    flow_hardware: "Hardveres (RTS/CTS)"
+    flow_software: "Szoftveres (XON/XOFF)"
+    dtr_on: "DTR Be"
+    dtr_off: "DTR Ki"
+    rts_on: "RTS Be"
+    rts_off: "RTS Ki"
+  
+  # Hálózati beállítások
+  network:
+    host: "Host"
+    port: "Port"
+    timeout: "Időtúllépés"
+    username: "Felhasználónév"
+    password: "Jelszó"
+    key_file: "Kulcs fájl"
+  
+  # Gombok
+  btn:
+    connect: "Kapcsolódás"
+    disconnect: "Leválasztás"
+    cancel: "Mégse"
+    ok: "OK"
+    apply: "Alkalmaz"
+    save: "Mentés"
+    send: "Küldés"
+    clear: "Törlés"
+    refresh: "Frissítés"
+    add: "Hozzáadás"
+    delete: "Törlés"
+    edit: "Szerkesztés"
+    browse: "Tallózás"
+    start: "Indítás"
+    stop: "Leállítás"
+    close: "Bezárás"
+  
+  # Állapot
+  status:
+    connected: "Kapcsolódva"
+    disconnected: "Leválasztva"
+    connecting: "Kapcsolódás..."
+    error: "Hiba"
+    bytes_sent: "TX"
+    bytes_received: "RX"
+    ready: "Kész"
+  
+  # Oldalsó panel
+  side_panel:
+    profiles: "Profilok"
+    snippets: "Parancsok"
+    history: "Előzmények"
+    settings: "Beállítások"
+    chart: "Grafikon"
+  
+  # Profilok
+  profiles:
+    title: "Profilok"
+    no_profiles: "Nincsenek mentett profilok"
+    save_hint: "Kapcsolódj és mentsd el profilként"
+    filter_all: "Mind"
+    filter_serial: "Soros"
+    filter_tcp: "TCP"
+    filter_telnet: "Telnet"
+    filter_ssh: "SSH"
+    filter_ble: "BLE"
+    search: "Profilok keresése..."
+    used_times: "%{count}x használva"
+    click_to_connect: "Kattints a Kapcsolódásra"
+    double_click: "Dupla kattintás a kapcsolódáshoz"
+  
+  # Snippetek/Parancsok
+  snippets:
+    title: "Parancsok"
+    no_snippets: "Nincsenek mentett parancsok"
+    add_new: "Új parancs"
+    name: "Név"
+    command: "Parancs"
+    description: "Leírás"
+    double_click_to_insert: "Dupla kattintás a beillesztéshez"
+    type_commands_to_save: "A beírt parancsok automatikusan mentődnek"
+    no_profile_active: "Nincs aktív profil"
+    connect_to_see_commands: "Kapcsolódj egy profilból a parancsok mentéséhez"
+    sorted_by_usage: "Gyakoriság szerint rendezve"
+    no_commands_yet: "Még nincsenek parancsok"
+    tip_save_profile: "Tipp: Először mentsd el a kapcsolatot profilként"
+  
+  # Fájl átvitel
+  transfer:
+    title: "Fájl átvitel"
+    xmodem: "XMODEM"
+    ymodem: "YMODEM"
+    zmodem: "ZMODEM"
+    sftp: "SFTP"
+    select_file: "Fájl kiválasztása"
+    send: "Küldés"
+    receive: "Fogadás"
+    progress: "Folyamat"
+    complete: "Kész"
+    failed: "Sikertelen"
+  
+  # Naplózás
+  log:
+    enabled: "Naplózás engedélyezése"
+    file: "Napló fájl"
+    format: "Formátum"
+    timestamps: "Időbélyegek hozzáadása"
+    start: "Naplózás indítása"
+    stop: "Naplózás leállítása"
+  
+  # Beállítások
+  settings:
+    title: "Beállítások"
+    theme: "Téma"
+    theme_dark: "Sötét"
+    theme_light: "Világos"
+    language: "Nyelv"
+    font_size: "Betűméret"
+    line_ending: "Sorvég"
+    local_echo: "Helyi visszhang"
+    auto_scroll: "Auto görgetés"
+    show_timestamps: "Időbélyegek"
+    show_hex: "Hex nézet"
+  
+  # Hibák
+  error:
+    connection_failed: "Kapcsolódás sikertelen"
+    port_not_found: "Port nem található"
+    permission_denied: "Hozzáférés megtagadva"
+    timeout: "Időtúllépés"
+    send_failed: "Küldés sikertelen"
+    auth_failed: "Azonosítás sikertelen"
+  
+  # Súgó
+  help:
+    about: "Névjegy"
+    user_guide: "Felhasználói útmutató"
+    keyboard_shortcuts: "Billentyűparancsok"
+    check_updates: "Frissítések keresése"
+  
+  # Makrók
+  macros:
+    title: "Makrók"
+    set_macros: "Makrók beállítása"
+    edit: "Makró szerkesztése"
+    name: "Név"
+    command: "Parancs"
+    hex_mode: "Hex mód"
+    append_crlf: "CR+LF hozzáadása"
+    click_to_send: "Kattints a küldéshez"
+    right_click_edit: "Jobb klikk a szerkesztéshez"
+  
+  # Előzmények
+  history:
+    empty: "Nincs parancs előzmény"
+    double_click: "Dupla kattintás a beillesztéshez"
