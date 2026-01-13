@@ -268,25 +268,25 @@ mod tests {
     #[test]
     fn test_encode_upper() {
         let codec = HexCodec::new().bytes_per_line(0);
-        assert_eq!(codec.encode(b"Hello"), "48 45 4C 4C 4F");
+        assert_eq!(codec.encode(b"Hello"), "48 65 6C 6C 6F");
     }
 
     #[test]
     fn test_encode_lower() {
         let codec = HexCodec::new().format(HexFormat::Lower).bytes_per_line(0);
-        assert_eq!(codec.encode(b"Hello"), "48 45 6c 6c 6f");
+        assert_eq!(codec.encode(b"Hello"), "48 65 6c 6c 6f");
     }
 
     #[test]
     fn test_encode_compact() {
         let codec = HexCodec::new().format(HexFormat::Compact).bytes_per_line(0);
-        assert_eq!(codec.encode(b"Hello"), "48454C4C4F");
+        assert_eq!(codec.encode(b"Hello"), "48656C6C6F");
     }
 
     #[test]
     fn test_decode() {
         let codec = HexCodec::new();
-        let result = codec.decode("48 45 4C 4C 4F").unwrap();
+        let result = codec.decode("48 65 6C 6C 6F").unwrap();
         assert_eq!(&result[..], b"Hello");
     }
 
@@ -297,6 +297,8 @@ mod tests {
         assert_eq!(&result[..], b"HEL");
     }
 }
+
+
 
 
 

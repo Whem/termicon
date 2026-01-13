@@ -276,9 +276,9 @@ impl SftpPanel {
         let mut clear_error = false;
         if let Some(error) = error_to_show {
             ui.horizontal(|ui| {
-                ui.label(RichText::new("⚠").color(Color32::YELLOW));
+                ui.label(RichText::new("[!]").color(Color32::YELLOW));
                 ui.label(RichText::new(&error).color(Color32::YELLOW));
-                if ui.small_button("✕").clicked() {
+                if ui.small_button("x").clicked() {
                     clear_error = true;
                 }
             });
@@ -326,7 +326,7 @@ impl SftpPanel {
                 
                 // Path bar
                 ui.horizontal(|ui| {
-                    ui.label("📂");
+                    ui.label("[D]");
                     let mut path = self.local_path.clone();
                     if ui.text_edit_singleline(&mut path).changed() {
                         local_path_changed = Some(path);
@@ -369,10 +369,10 @@ impl SftpPanel {
             // Transfer buttons
             ui.vertical(|ui| {
                 ui.add_space(100.0);
-                if ui.button("➡").on_hover_text("Upload").clicked() {
+                if ui.button(">>").on_hover_text("Upload").clicked() {
                     // Upload
                 }
-                if ui.button("⬅").on_hover_text("Download").clicked() {
+                if ui.button("<<").on_hover_text("Download").clicked() {
                     // Download
                 }
             });
@@ -390,7 +390,7 @@ impl SftpPanel {
                 } else {
                     // Path bar
                     ui.horizontal(|ui| {
-                        ui.label("📂");
+                        ui.label("[D]");
                         let mut path = self.remote_path.clone();
                         if ui.text_edit_singleline(&mut path).changed() {
                             remote_path_changed = Some(path);

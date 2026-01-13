@@ -6,8 +6,8 @@
 //! - Telnet protocol
 //! - SSH-2 protocol
 
-// Initialize i18n for the binary - translations are loaded from locales folder
-rust_i18n::i18n!("locales", fallback = "en");
+// Initialize i18n for the binary - translations are loaded from i18n folder (TOML)
+rust_i18n::i18n!("i18n", fallback = "en");
 
 use eframe::egui;
 use image::GenericImageView;

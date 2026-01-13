@@ -178,9 +178,12 @@ impl KermitPacket {
             .ok_or(KermitError::InvalidPacket)?;
         
         // Data (decode)
-        let data_end = len - 1; // Exclude checksum
-        let raw_data = if data_end > 3 {
-            decode_data(&packet_data[4..data_end + 1], config)?
+        // LEN counts: SEQ + TYPE + DATA + CHECK (type 1) => DATA length is LEN - 3.
+        let data_len = len.saturating_sub(3);
+        let raw_data = if data_len > 0 {
+            let data_start = 4;
+            let data_end_excl = data_start + data_len;
+            decode_data(&packet_data[data_start..data_end_excl], config)?
         } else {
             Vec::new()
         };
@@ -756,5 +759,7 @@ mod tests {
         assert_eq!(decoded.data, b"Hello");
     }
 }
+
+
 
 

@@ -714,7 +714,8 @@ mod tests {
     #[test]
     fn test_gga_parse() {
         let mut parser = NmeaParser::new();
-        let sentence = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,47.0,M,,*47";
+        // Canonical NMEA example sentence (checksum 0x47)
+        let sentence = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47";
         
         let result = parser.parse(sentence);
         assert!(result.is_ok());
@@ -742,7 +743,7 @@ mod tests {
     
     #[test]
     fn test_checksum() {
-        let checksum = NmeaParser::calculate_checksum("GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,47.0,M,,");
+        let checksum = NmeaParser::calculate_checksum("GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,");
         assert_eq!(checksum, 0x47);
     }
 }

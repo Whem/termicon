@@ -566,10 +566,10 @@ mod tests {
 
     #[test]
     fn test_crc16() {
-        // Test CRC-16 CCITT
+        // XMODEM CRC-16 (poly=0x1021, init=0x0000)
         let data = b"123456789";
         let crc = XmodemTransfer::crc16(data);
-        assert_eq!(crc, 0x29B1); // Known value for this string
+        assert_eq!(crc, 0x31C3); // Known value for this string (CRC-16/XMODEM)
     }
 
     #[test]

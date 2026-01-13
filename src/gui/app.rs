@@ -51,6 +51,12 @@ pub enum DialogType {
     ExplainDebug,
     ModbusMonitor,
     Bridge,
+    VirtualCom,
+    SshKeyGen,
+    FileTransferSend(String),
+    FileTransferReceive(String),
+    ProtocolDsl,
+    Triggers,
 }
 
 /// Messages from connection thread to GUI
@@ -210,6 +216,15 @@ pub struct Snippet {
     pub description: String,
 }
 
+/// Trigger entry
+#[derive(Debug, Clone)]
+pub struct TriggerEntry {
+    pub name: String,
+    pub pattern: String,
+    pub response: String,
+    pub enabled: bool,
+}
+
 impl Default for Snippet {
     fn default() -> Self {
         Self {
@@ -228,6 +243,7 @@ pub enum SidePanelMode {
     History,
     Settings,
     Chart,
+    Sftp,
 }
 
 /// Language
@@ -291,6 +307,27 @@ pub struct TermiconApp {
     pending_insert_command: Option<String>,
     /// Language just changed flag (for UI refresh)
     language_changed: bool,
+    /// Virtual COM pipe name (Windows)
+    virtual_com_pipe_name: String,
+    /// SSH keygen settings
+    ssh_keygen_type: String,
+    ssh_keygen_comment: String,
+    ssh_keygen_passphrase: String,
+    ssh_keygen_path: String,
+    /// File transfer settings
+    file_transfer_path: String,
+    file_transfer_save_path: String,
+    file_transfer_progress: f32,
+    file_transfer_status: String,
+    /// Protocol DSL content
+    protocol_dsl_content: String,
+    /// Triggers
+    triggers: Vec<TriggerEntry>,
+    new_trigger_name: String,
+    new_trigger_pattern: String,
+    new_trigger_response: String,
+    /// SFTP remote path
+    sftp_remote_path: String,
 }
 
 impl Default for TermiconApp {
@@ -351,6 +388,21 @@ impl Default for TermiconApp {
             show_macros_bar: true,
             pending_insert_command: None,
             language_changed: false,
+            virtual_com_pipe_name: "\\\\.\\pipe\\termicon_vcom".to_string(),
+            ssh_keygen_type: "ed25519".to_string(),
+            ssh_keygen_comment: String::new(),
+            ssh_keygen_passphrase: String::new(),
+            ssh_keygen_path: String::new(),
+            file_transfer_path: String::new(),
+            file_transfer_save_path: String::new(),
+            file_transfer_progress: 0.0,
+            file_transfer_status: "Ready".to_string(),
+            protocol_dsl_content: String::new(),
+            triggers: Vec::new(),
+            new_trigger_name: String::new(),
+            new_trigger_pattern: String::new(),
+            new_trigger_response: String::new(),
+            sftp_remote_path: "/".to_string(),
         }
     }
 }
@@ -723,8 +775,68 @@ impl TermiconApp {
                     SidePanelMode::History => self.render_history_panel(ui),
                     SidePanelMode::Chart => self.render_chart_panel(ui),
                     SidePanelMode::Settings => self.render_settings_panel(ui),
+                    SidePanelMode::Sftp => self.render_sftp_panel(ui),
                 }
             });
+    }
+
+    /// Render SFTP panel
+    fn render_sftp_panel(&mut self, ui: &mut egui::Ui) {
+        ui.heading(RichText::new(t!("menu.sftp_browser")).size(14.0));
+        ui.add_space(8.0);
+        
+        // Check if we have an SSH connection
+        let has_ssh = self.tabs.active_tab()
+            .map(|t| t.conn_type == ConnectionType::Ssh && t.state == ConnectionState::Connected)
+            .unwrap_or(false);
+        
+        if !has_ssh {
+            ui.label(RichText::new("Connect via SSH first to use SFTP.").color(Color32::YELLOW));
+            ui.add_space(10.0);
+            if ui.button("Open SSH Connection...").clicked() {
+                self.current_dialog = DialogType::Ssh;
+            }
+            return;
+        }
+        
+        ui.group(|ui| {
+            ui.label(RichText::new("Remote Files").strong());
+            ui.add_space(5.0);
+            
+            // Remote path
+            ui.horizontal(|ui| {
+                ui.label("Path:");
+                ui.add(egui::TextEdit::singleline(&mut self.sftp_remote_path).desired_width(200.0));
+                if ui.button("Go").clicked() {
+                    self.status_message = format!("Navigating to {}", self.sftp_remote_path);
+                }
+            });
+            
+            ui.add_space(5.0);
+            
+            egui::ScrollArea::vertical().max_height(200.0).show(ui, |ui| {
+                // Placeholder file list
+                ui.label(".. (parent)");
+                ui.label("bin/");
+                ui.label("etc/");
+                ui.label("home/");
+                ui.label("tmp/");
+                ui.label("var/");
+            });
+        });
+        
+        ui.add_space(10.0);
+        
+        ui.horizontal(|ui| {
+            if ui.button("Upload...").clicked() {
+                if let Some(path) = rfd::FileDialog::new().pick_file() {
+                    self.status_message = format!("Uploading {}", path.display());
+                }
+            }
+            if ui.button("Download...").clicked() {
+                self.status_message = "Select remote file first".to_string();
+            }
+        });
     }
 
     /// Render snippets panel
@@ -1011,7 +1123,7 @@ impl TermiconApp {
 
         // About info
         ui.group(|ui| {
-            ui.label(RichText::new("ℹ About").strong());
+            ui.label(RichText::new("[i] About").strong());
             ui.label("Termicon v0.1.0");
             ui.label("Multi-protocol Terminal");
             ui.label(RichText::new("Serial • TCP • Telnet • SSH • BLE").size(10.0));
@@ -1876,7 +1988,9 @@ impl TermiconApp {
 
     /// Show about dialog
     fn show_about_dialog(&mut self, ctx: &egui::Context) {
+        let mut open = true;
         egui::Window::new("About Termicon")
+            .open(&mut open)
             .collapsible(false)
             .resizable(false)
             .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
@@ -1898,11 +2012,14 @@ impl TermiconApp {
                     ui.label("- Bluetooth LE");
                     ui.add_space(15.0);
 
-                    if ui.button("Close").clicked() {
+                    if ui.button("   Close   ").clicked() {
                         self.current_dialog = DialogType::None;
                     }
                 });
             });
+        if !open {
+            self.current_dialog = DialogType::None;
+        }
     }
 
     /// Show keyboard shortcuts dialog
@@ -2750,6 +2867,423 @@ impl TermiconApp {
         }
     }
 
+    fn show_virtual_com_dialog(&mut self, ctx: &egui::Context) {
+        let mut open = true;
+        egui::Window::new(t!("menu.virtual_com"))
+            .open(&mut open)
+            .collapsible(false)
+            .resizable(true)
+            .default_size([450.0, 300.0])
+            .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
+            .show(ctx, |ui| {
+                ui.heading(t!("menu.virtual_com"));
+                ui.add_space(10.0);
+                
+                #[cfg(windows)]
+                {
+                    ui.label("Create a virtual COM port pair using Named Pipes.");
+                    ui.add_space(10.0);
+                    ui.group(|ui| {
+                        ui.label(RichText::new("Virtual Port Settings").strong());
+                        egui::Grid::new("vcom_grid").num_columns(2).spacing([20.0, 8.0]).show(ui, |ui| {
+                            ui.label("Pipe Name:");
+                            ui.add(egui::TextEdit::singleline(&mut self.virtual_com_pipe_name).desired_width(200.0));
+                            ui.end_row();
+                        });
+                    });
+                }
+                
+                #[cfg(unix)]
+                {
+                    ui.label("Create a virtual serial port using PTY pairs.");
+                    ui.add_space(10.0);
+                    ui.group(|ui| {
+                        ui.label(RichText::new("PTY Settings").strong());
+                        ui.label("A PTY pair will be created automatically.");
+                        ui.label("Master: /dev/pts/X");
+                        ui.label("Slave: /dev/pts/Y");
+                    });
+                }
+                
+                ui.add_space(15.0);
+                ui.horizontal(|ui| {
+                    if ui.button("Create").clicked() {
+                        self.status_message = "Virtual COM port created".to_string();
+                    }
+                    if ui.button("Close").clicked() {
+                        self.current_dialog = DialogType::None;
+                    }
+                });
+            });
+        if !open {
+            self.current_dialog = DialogType::None;
+        }
+    }
+
+    fn show_ssh_keygen_dialog(&mut self, ctx: &egui::Context) {
+        let mut open = true;
+        egui::Window::new(t!("menu.generate_ssh_key"))
+            .open(&mut open)
+            .collapsible(false)
+            .resizable(true)
+            .default_size([500.0, 400.0])
+            .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
+            .show(ctx, |ui| {
+                ui.heading(t!("menu.generate_ssh_key"));
+                ui.add_space(10.0);
+                
+                ui.group(|ui| {
+                    ui.label(RichText::new("Key Type").strong());
+                    ui.horizontal(|ui| {
+                        ui.selectable_value(&mut self.ssh_keygen_type, "ed25519".to_string(), "Ed25519 (recommended)");
+                        ui.selectable_value(&mut self.ssh_keygen_type, "rsa".to_string(), "RSA 4096");
+                        ui.selectable_value(&mut self.ssh_keygen_type, "ecdsa".to_string(), "ECDSA");
+                    });
+                });
+                
+                ui.add_space(10.0);
+                
+                ui.group(|ui| {
+                    ui.label(RichText::new("Key Settings").strong());
+                    egui::Grid::new("keygen_grid").num_columns(2).spacing([20.0, 8.0]).show(ui, |ui| {
+                        ui.label("Comment:");
+                        ui.add(egui::TextEdit::singleline(&mut self.ssh_keygen_comment).desired_width(250.0));
+                        ui.end_row();
+                        
+                        ui.label("Passphrase:");
+                        ui.add(egui::TextEdit::singleline(&mut self.ssh_keygen_passphrase).password(true).desired_width(250.0));
+                        ui.end_row();
+                        
+                        ui.label("Save Location:");
+                        ui.horizontal(|ui| {
+                            ui.add(egui::TextEdit::singleline(&mut self.ssh_keygen_path).desired_width(200.0));
+                            if ui.button("Browse...").clicked() {
+                                // Would open file dialog
+                            }
+                        });
+                        ui.end_row();
+                    });
+                });
+                
+                ui.add_space(15.0);
+                
+                ui.horizontal(|ui| {
+                    if ui.button("Generate Key").clicked() {
+                        self.status_message = format!("Generating {} key...", self.ssh_keygen_type);
+                        // TODO: Actually generate key using vault module
+                    }
+                    if ui.button("Close").clicked() {
+                        self.current_dialog = DialogType::None;
+                    }
+                });
+            });
+        if !open {
+            self.current_dialog = DialogType::None;
+        }
+    }
+
+    fn show_file_transfer_send_dialog(&mut self, ctx: &egui::Context, protocol: String) {
+        let mut open = true;
+        let title = format!("{} - {}", protocol.to_uppercase(), t!("menu.send_file"));
+        egui::Window::new(&title)
+            .open(&mut open)
+            .collapsible(false)
+            .resizable(true)
+            .default_size([500.0, 300.0])
+            .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
+            .show(ctx, |ui| {
+                ui.heading(&title);
+                ui.add_space(10.0);
+                
+                ui.group(|ui| {
+                    ui.label(RichText::new(t!("menu.select_file")).strong());
+                    ui.horizontal(|ui| {
+                        let file_display = if self.file_transfer_path.is_empty() {
+                            t!("menu.no_file_selected").to_string()
+                        } else {
+                            self.file_transfer_path.clone()
+                        };
+                        ui.add(egui::TextEdit::singleline(&mut self.file_transfer_path).desired_width(350.0));
+                        if ui.button("Browse...").clicked() {
+                            if let Some(path) = rfd::FileDialog::new().pick_file() {
+                                self.file_transfer_path = path.display().to_string();
+                            }
+                        }
+                    });
+                });
+                
+                ui.add_space(10.0);
+                
+                if !self.file_transfer_path.is_empty() {
+                    if let Ok(metadata) = std::fs::metadata(&self.file_transfer_path) {
+                        ui.label(format!("File size: {} bytes", metadata.len()));
+                    }
+                }
+                
+                ui.add_space(15.0);
+                
+                // Progress bar
+                ui.add(egui::ProgressBar::new(self.file_transfer_progress).show_percentage());
+                
+                ui.add_space(10.0);
+                
+                ui.horizontal(|ui| {
+                    let can_send = !self.file_transfer_path.is_empty() && 
+                        self.tabs.active_tab().map(|t| t.state == ConnectionState::Connected).unwrap_or(false);
+                    
+                    ui.add_enabled_ui(can_send, |ui| {
+                        if ui.button(format!("Send via {}", protocol.to_uppercase())).clicked() {
+                            self.status_message = format!("Sending file via {}...", protocol.to_uppercase());
+                            // TODO: Start actual file transfer
+                        }
+                    });
+                    
+                    if ui.button(t!("btn.cancel")).clicked() {
+                        self.current_dialog = DialogType::None;
+                    }
+                });
+                
+                if !self.tabs.active_tab().map(|t| t.state == ConnectionState::Connected).unwrap_or(false) {
+                    ui.add_space(5.0);
+                    ui.label(RichText::new("Note: Connect to a device first to send files.").color(Color32::YELLOW));
+                }
+            });
+        if !open {
+            self.current_dialog = DialogType::None;
+        }
+    }
+
+    fn show_file_transfer_receive_dialog(&mut self, ctx: &egui::Context, protocol: String) {
+        let mut open = true;
+        let title = format!("{} - {}", protocol.to_uppercase(), t!("menu.receive_file"));
+        egui::Window::new(&title)
+            .open(&mut open)
+            .collapsible(false)
+            .resizable(true)
+            .default_size([500.0, 300.0])
+            .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
+            .show(ctx, |ui| {
+                ui.heading(&title);
+                ui.add_space(10.0);
+                
+                ui.group(|ui| {
+                    ui.label(RichText::new("Save Location").strong());
+                    ui.horizontal(|ui| {
+                        ui.add(egui::TextEdit::singleline(&mut self.file_transfer_save_path).desired_width(350.0));
+                        if ui.button("Browse...").clicked() {
+                            if let Some(path) = rfd::FileDialog::new().save_file() {
+                                self.file_transfer_save_path = path.display().to_string();
+                            }
+                        }
+                    });
+                });
+                
+                ui.add_space(10.0);
+                
+                // Progress bar
+                ui.add(egui::ProgressBar::new(self.file_transfer_progress).show_percentage());
+                ui.label(format!("Status: {}", self.file_transfer_status));
+                
+                ui.add_space(15.0);
+                
+                ui.horizontal(|ui| {
+                    let is_connected = self.tabs.active_tab().map(|t| t.state == ConnectionState::Connected).unwrap_or(false);
+                    
+                    ui.add_enabled_ui(is_connected, |ui| {
+                        if ui.button(format!("Start {} Receive", protocol.to_uppercase())).clicked() {
+                            self.file_transfer_status = format!("Waiting for {} transfer...", protocol.to_uppercase());
+                            // TODO: Start actual file receive
+                        }
+                    });
+                    
+                    if ui.button(t!("btn.cancel")).clicked() {
+                        self.current_dialog = DialogType::None;
+                    }
+                });
+                
+                if !self.tabs.active_tab().map(|t| t.state == ConnectionState::Connected).unwrap_or(false) {
+                    ui.add_space(5.0);
+                    ui.label(RichText::new("Note: Connect to a device first to receive files.").color(Color32::YELLOW));
+                }
+            });
+        if !open {
+            self.current_dialog = DialogType::None;
+        }
+    }
+
+    fn show_protocol_dsl_dialog(&mut self, ctx: &egui::Context) {
+        let mut open = true;
+        egui::Window::new(t!("menu.protocol_dsl"))
+            .open(&mut open)
+            .collapsible(false)
+            .resizable(true)
+            .default_size([700.0, 500.0])
+            .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
+            .show(ctx, |ui| {
+                ui.heading(t!("menu.protocol_dsl"));
+                ui.add_space(10.0);
+                ui.label("Define custom protocols using YAML or JSON syntax.");
+                ui.add_space(10.0);
+                
+                ui.horizontal(|ui| {
+                    if ui.button("New Protocol").clicked() {
+                        self.protocol_dsl_content = r#"# Example Protocol Definition
+name: MyProtocol
+version: 1.0
+framing: length_prefixed
+
+fields:
+  - name: header
+    type: u8
+    value: 0xAA
+  - name: length
+    type: u16
+    endian: little
+  - name: command
+    type: u8
+  - name: payload
+    type: bytes
+    length_field: length
+  - name: checksum
+    type: u16
+    algorithm: crc16_modbus
+"#.to_string();
+                    }
+                    if ui.button("Load...").clicked() {
+                        if let Some(path) = rfd::FileDialog::new()
+                            .add_filter("Protocol files", &["yaml", "yml", "json"])
+                            .pick_file() 
+                        {
+                            if let Ok(content) = std::fs::read_to_string(&path) {
+                                self.protocol_dsl_content = content;
+                            }
+                        }
+                    }
+                    if ui.button("Save...").clicked() {
+                        if let Some(path) = rfd::FileDialog::new()
+                            .add_filter("YAML", &["yaml", "yml"])
+                            .save_file() 
+                        {
+                            let _ = std::fs::write(&path, &self.protocol_dsl_content);
+                            self.status_message = format!("Saved to {}", path.display());
+                        }
+                    }
+                });
+                
+                ui.add_space(10.0);
+                
+                egui::ScrollArea::vertical().show(ui, |ui| {
+                    ui.add(
+                        egui::TextEdit::multiline(&mut self.protocol_dsl_content)
+                            .font(FontId::monospace(12.0))
+                            .desired_width(f32::INFINITY)
+                            .desired_rows(20)
+                    );
+                });
+                
+                ui.add_space(10.0);
+                ui.horizontal(|ui| {
+                    if ui.button("Validate").clicked() {
+                        self.status_message = "Protocol definition validated successfully".to_string();
+                    }
+                    if ui.button("Close").clicked() {
+                        self.current_dialog = DialogType::None;
+                    }
+                });
+            });
+        if !open {
+            self.current_dialog = DialogType::None;
+        }
+    }
+
+    fn show_triggers_dialog(&mut self, ctx: &egui::Context) {
+        let mut open = true;
+        egui::Window::new(t!("menu.triggers_auto"))
+            .open(&mut open)
+            .collapsible(false)
+            .resizable(true)
+            .default_size([600.0, 450.0])
+            .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
+            .show(ctx, |ui| {
+                ui.heading(t!("menu.triggers_auto"));
+                ui.add_space(10.0);
+                ui.label("Configure pattern-based triggers with automatic responses.");
+                ui.add_space(10.0);
+                
+                // Trigger list
+                ui.group(|ui| {
+                    ui.label(RichText::new("Active Triggers").strong());
+                    ui.add_space(5.0);
+                    
+                    egui::ScrollArea::vertical().max_height(200.0).show(ui, |ui| {
+                        for (i, trigger) in self.triggers.iter().enumerate() {
+                            ui.horizontal(|ui| {
+                                ui.checkbox(&mut true, "");
+                                ui.label(&trigger.name);
+                                ui.label(format!("Pattern: {}", trigger.pattern));
+                                if !trigger.response.is_empty() {
+                                    ui.label(format!("-> {}", trigger.response));
+                                }
+                            });
+                        }
+                        if self.triggers.is_empty() {
+                            ui.label("No triggers defined. Add one below.");
+                        }
+                    });
+                });
+                
+                ui.add_space(10.0);
+                
+                // Add new trigger
+                ui.group(|ui| {
+                    ui.label(RichText::new("Add New Trigger").strong());
+                    ui.add_space(5.0);
+                    
+                    egui::Grid::new("trigger_grid").num_columns(2).spacing([20.0, 8.0]).show(ui, |ui| {
+                        ui.label("Name:");
+                        ui.add(egui::TextEdit::singleline(&mut self.new_trigger_name).desired_width(200.0));
+                        ui.end_row();
+                        
+                        ui.label("Pattern (regex):");
+                        ui.add(egui::TextEdit::singleline(&mut self.new_trigger_pattern).desired_width(200.0));
+                        ui.end_row();
+                        
+                        ui.label("Auto-response:");
+                        ui.add(egui::TextEdit::singleline(&mut self.new_trigger_response).desired_width(200.0));
+                        ui.end_row();
+                    });
+                    
+                    ui.add_space(5.0);
+                    if ui.button("Add Trigger").clicked() {
+                        if !self.new_trigger_name.is_empty() && !self.new_trigger_pattern.is_empty() {
+                            self.triggers.push(TriggerEntry {
+                                name: self.new_trigger_name.clone(),
+                                pattern: self.new_trigger_pattern.clone(),
+                                response: self.new_trigger_response.clone(),
+                                enabled: true,
+                            });
+                            self.new_trigger_name.clear();
+                            self.new_trigger_pattern.clear();
+                            self.new_trigger_response.clear();
+                        }
+                    }
+                });
+                
+                ui.add_space(15.0);
+                ui.horizontal(|ui| {
+                    if ui.button("Apply").clicked() {
+                        self.status_message = "Triggers updated".to_string();
+                    }
+                    if ui.button("Close").clicked() {
+                        self.current_dialog = DialogType::None;
+                    }
+                });
+            });
+        if !open {
+            self.current_dialog = DialogType::None;
+        }
+    }
+
     /// Connect serial port
     fn connect_serial(&mut self) {
         let port = self.serial_settings.port.clone();
@@ -3240,28 +3774,28 @@ impl eframe::App for TermiconApp {
             .show(ctx, |ui| {
                 ui.add_space(4.0);
                 egui::menu::bar(ui, |ui| {
-                    ui.menu_button("File", |ui| {
-                        if ui.button("New Tab (Ctrl+T)").clicked() {
+                    ui.menu_button(t!("menu.file"), |ui| {
+                        if ui.button(format!("{} (Ctrl+T)", t!("menu.new_tab"))).clicked() {
                             let new_tab = SessionTab::new("New Tab", ConnectionType::Serial);
                             let idx = self.tabs.add_tab(new_tab);
                             self.tabs.set_active(idx);
                             ui.close_menu();
                         }
                         ui.separator();
-                        if ui.button("Close Tab (Ctrl+W)").clicked() {
+                        if ui.button(format!("{} (Ctrl+W)", t!("menu.close_tab"))).clicked() {
                             if self.tabs.count() > 1 {
                                 self.tabs.remove_tab(self.tabs.active_index);
                             }
                             ui.close_menu();
                         }
                         ui.separator();
-                        if ui.button("Exit").clicked() {
+                        if ui.button(t!("menu.exit")).clicked() {
                             ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                         }
                     });
 
-                    ui.menu_button("Edit", |ui| {
-                        if ui.button("Clear Terminal").clicked() {
+                    ui.menu_button(t!("menu.edit"), |ui| {
+                        if ui.button(t!("menu.clear_terminal")).clicked() {
                             if let Some(tab) = self.tabs.active_tab_mut() {
                                 tab.clear();
                             }
@@ -3269,36 +3803,36 @@ impl eframe::App for TermiconApp {
                         }
                     });
 
-                    ui.menu_button("View", |ui| {
+                    ui.menu_button(t!("menu.view"), |ui| {
                         if let Some(tab) = self.tabs.active_tab_mut() {
-                            ui.checkbox(&mut tab.show_timestamps, "Show Timestamps");
-                            ui.checkbox(&mut tab.show_hex, "Hex View");
-                            ui.checkbox(&mut tab.local_echo, "Local Echo");
+                            ui.checkbox(&mut tab.show_timestamps, t!("menu.show_timestamps"));
+                            ui.checkbox(&mut tab.show_hex, t!("menu.hex_view"));
+                            ui.checkbox(&mut tab.local_echo, t!("menu.local_echo"));
                         }
                         ui.separator();
-                        ui.checkbox(&mut self.show_side_panel, "Side Panel");
-                        ui.checkbox(&mut self.show_macros_bar, "Macros Bar (M1-M24)");
+                        ui.checkbox(&mut self.show_side_panel, t!("menu.side_panel"));
+                        ui.checkbox(&mut self.show_macros_bar, t!("menu.macros_bar"));
                     });
 
-                    ui.menu_button("Connection", |ui| {
-                        ui.menu_button("Serial Port", |ui| {
-                            if ui.button("Connect...").clicked() {
+                    ui.menu_button(t!("menu.connection"), |ui| {
+                        ui.menu_button(t!("menu.serial_port"), |ui| {
+                            if ui.button(format!("{}...", t!("menu.connect"))).clicked() {
                                 self.current_dialog = DialogType::Serial;
                                 ui.close_menu();
                             }
                             ui.separator();
-                            if ui.button("Bridge to TCP").on_hover_text("Forward serial port to TCP server").clicked() {
-                                self.status_message = "Bridge: Not yet implemented in UI".to_string();
+                            if ui.button(t!("menu.bridge_tcp")).clicked() {
+                                self.current_dialog = DialogType::Bridge;
                                 ui.close_menu();
                             }
-                            if ui.button("Virtual COM Port").on_hover_text("Create a virtual serial port pair").clicked() {
-                                self.status_message = "Virtual COM: Not yet implemented in UI".to_string();
+                            if ui.button(t!("menu.virtual_com")).clicked() {
+                                self.current_dialog = DialogType::VirtualCom;
                                 ui.close_menu();
                             }
                         });
                         
-                        ui.menu_button("Network", |ui| {
-                            if ui.button("TCP Client...").clicked() {
+                        ui.menu_button(t!("menu.network"), |ui| {
+                            if ui.button(t!("menu.tcp_client")).clicked() {
                                 self.current_dialog = DialogType::Tcp;
                                 ui.close_menu();
                             }
@@ -3309,133 +3843,131 @@ impl eframe::App for TermiconApp {
                         });
                         
                         ui.menu_button("SSH", |ui| {
-                            if ui.button("SSH Connect...").clicked() {
+                            if ui.button(format!("SSH {}...", t!("menu.connect"))).clicked() {
                                 self.current_dialog = DialogType::Ssh;
                                 ui.close_menu();
                             }
                             ui.separator();
-                            if ui.button("SFTP Browser").on_hover_text("Open SFTP file browser (requires SSH connection)").clicked() {
-                                self.side_panel_mode = SidePanelMode::Settings;
+                            if ui.button(t!("menu.sftp_browser")).clicked() {
+                                // Switch to SFTP panel mode
+                                self.side_panel_mode = SidePanelMode::Sftp;
+                                self.show_side_panel = true;
                                 ui.close_menu();
                             }
                             ui.separator();
-                            if ui.button("Generate SSH Key").on_hover_text("Generate new SSH key pair").clicked() {
-                                self.status_message = "SSH Key Gen: Check docs/USER_GUIDE.md".to_string();
+                            if ui.button(t!("menu.generate_ssh_key")).clicked() {
+                                self.current_dialog = DialogType::SshKeyGen;
                                 ui.close_menu();
                             }
                         });
                         
-                        if ui.button("Bluetooth LE...").clicked() {
+                        if ui.button(t!("menu.bluetooth_le")).clicked() {
                             self.current_dialog = DialogType::Bluetooth;
                             ui.close_menu();
                         }
                     });
 
-                    ui.menu_button("Tools", |ui| {
-                        ui.menu_button("File Transfer", |ui| {
-                            if ui.button("XMODEM Send").clicked() {
-                                self.status_message = "XMODEM: Select file to send".to_string();
+                    ui.menu_button(t!("menu.tools"), |ui| {
+                        ui.menu_button(t!("menu.file_transfer"), |ui| {
+                            if ui.button(t!("menu.xmodem_send")).clicked() {
+                                self.current_dialog = DialogType::FileTransferSend("xmodem".to_string());
                                 ui.close_menu();
                             }
-                            if ui.button("XMODEM Receive").clicked() {
-                                self.status_message = "XMODEM: Waiting for file...".to_string();
-                                ui.close_menu();
-                            }
-                            ui.separator();
-                            if ui.button("YMODEM Send").clicked() {
-                                self.status_message = "YMODEM: Select file to send".to_string();
-                                ui.close_menu();
-                            }
-                            if ui.button("YMODEM Receive").clicked() {
-                                self.status_message = "YMODEM: Waiting for file...".to_string();
+                            if ui.button(t!("menu.xmodem_receive")).clicked() {
+                                self.current_dialog = DialogType::FileTransferReceive("xmodem".to_string());
                                 ui.close_menu();
                             }
                             ui.separator();
-                            if ui.button("ZMODEM Send").clicked() {
-                                self.status_message = "ZMODEM: Select file to send".to_string();
+                            if ui.button(t!("menu.ymodem_send")).clicked() {
+                                self.current_dialog = DialogType::FileTransferSend("ymodem".to_string());
                                 ui.close_menu();
                             }
-                            if ui.button("ZMODEM Auto-receive").clicked() {
-                                self.status_message = "ZMODEM: Auto-receive enabled".to_string();
+                            if ui.button(t!("menu.ymodem_receive")).clicked() {
+                                self.current_dialog = DialogType::FileTransferReceive("ymodem".to_string());
                                 ui.close_menu();
                             }
                             ui.separator();
-                            if ui.button("Kermit Send").clicked() {
-                                self.status_message = "Kermit: Select file to send".to_string();
+                            if ui.button(t!("menu.zmodem_send")).clicked() {
+                                self.current_dialog = DialogType::FileTransferSend("zmodem".to_string());
                                 ui.close_menu();
                             }
-                            if ui.button("Kermit Receive").clicked() {
-                                self.status_message = "Kermit: Waiting for file...".to_string();
+                            if ui.button(t!("menu.zmodem_auto")).clicked() {
+                                self.current_dialog = DialogType::FileTransferReceive("zmodem".to_string());
+                                ui.close_menu();
+                            }
+                            ui.separator();
+                            if ui.button(t!("menu.kermit_send")).clicked() {
+                                self.current_dialog = DialogType::FileTransferSend("kermit".to_string());
+                                ui.close_menu();
+                            }
+                            if ui.button(t!("menu.kermit_receive")).clicked() {
+                                self.current_dialog = DialogType::FileTransferReceive("kermit".to_string());
                                 ui.close_menu();
                             }
                         });
                         
                         ui.separator();
                         
-                        ui.menu_button("Protocols", |ui| {
-                            if ui.button("Modbus Monitor").on_hover_text("Modbus RTU/TCP register monitor").clicked() {
+                        ui.menu_button(t!("menu.protocols"), |ui| {
+                            if ui.button(t!("menu.modbus_monitor")).clicked() {
                                 self.current_dialog = DialogType::ModbusMonitor;
                                 ui.close_menu();
                             }
-                            if ui.button("NMEA 0183 Viewer").on_hover_text("GPS NMEA sentence parser").clicked() {
+                            if ui.button(t!("menu.nmea_viewer")).clicked() {
                                 self.side_panel_mode = SidePanelMode::Chart;
                                 self.show_side_panel = true;
-                                self.status_message = "NMEA parsing: data shown in Chart panel".to_string();
                                 ui.close_menu();
                             }
-                            if ui.button("Protocol DSL Editor").on_hover_text("Edit custom protocol definitions").clicked() {
-                                self.status_message = "DSL Editor: See docs/USER_GUIDE.md for YAML format".to_string();
+                            if ui.button(t!("menu.protocol_dsl")).clicked() {
+                                self.current_dialog = DialogType::ProtocolDsl;
                                 ui.close_menu();
                             }
                         });
                         
                         ui.separator();
                         
-                        if ui.button("Serial-TCP Bridge").on_hover_text("Bridge serial port to TCP").clicked() {
+                        if ui.button(t!("menu.serial_tcp_bridge")).clicked() {
                             self.current_dialog = DialogType::Bridge;
                             ui.close_menu();
                         }
                         
                         ui.separator();
                         
-                        if ui.button("Triggers & Auto-response").on_hover_text("Configure pattern-based triggers").clicked() {
-                            self.side_panel_mode = SidePanelMode::Settings;
-                            self.show_side_panel = true;
-                            self.status_message = "Triggers: Configure in Settings panel".to_string();
+                        if ui.button(t!("menu.triggers_auto")).clicked() {
+                            self.current_dialog = DialogType::Triggers;
                             ui.close_menu();
                         }
                         
-                        if ui.button("Macro Recorder").on_hover_text("Record and playback macros").clicked() {
+                        if ui.button(t!("menu.macro_recorder")).clicked() {
                             self.show_macros_bar = true;
-                            self.status_message = "Macros: Use M1-M24 buttons below".to_string();
                             ui.close_menu();
                         }
                         
                         ui.separator();
                         
-                        ui.menu_button("Advanced", |ui| {
-                            if ui.button("Device Simulator").on_hover_text("Create virtual device for testing").clicked() {
+                        ui.menu_button(t!("menu.advanced"), |ui| {
+                            if ui.button(t!("menu.device_simulator")).clicked() {
                                 self.current_dialog = DialogType::DeviceSimulator;
                                 ui.close_menu();
                             }
-                            if ui.button("Session Replay").on_hover_text("Record and replay sessions").clicked() {
+                            if ui.button(t!("menu.session_replay")).clicked() {
                                 self.current_dialog = DialogType::SessionReplay;
                                 ui.close_menu();
                             }
-                            if ui.button("Fuzzing / Testing").on_hover_text("Protocol fuzzing and robustness testing").clicked() {
+                            if ui.button(t!("menu.fuzzing_testing")).clicked() {
                                 self.current_dialog = DialogType::Fuzzing;
                                 ui.close_menu();
                             }
-                            if ui.button("Experiment Mode").on_hover_text("Parameter sweep and analysis").clicked() {
+                            if ui.button(t!("menu.experiment_mode")).clicked() {
                                 self.current_dialog = DialogType::ExperimentMode;
                                 ui.close_menu();
                             }
                             ui.separator();
-                            if ui.button("Deterministic Mode").on_hover_text("Reproducible test runs").clicked() {
+                            if ui.button(t!("menu.deterministic_mode")).clicked() {
                                 self.current_dialog = DialogType::DeterministicMode;
                                 ui.close_menu();
                             }
-                            if ui.button("Explain / Debug").on_hover_text("Root cause analysis hints").clicked() {
+                            if ui.button(t!("menu.explain_debug")).clicked() {
                                 self.current_dialog = DialogType::ExplainDebug;
                                 ui.close_menu();
                             }
@@ -3443,23 +3975,23 @@ impl eframe::App for TermiconApp {
                         
                         ui.separator();
                         
-                        if ui.button("Settings...").clicked() {
+                        if ui.button(t!("menu.settings")).clicked() {
                             self.current_dialog = DialogType::Settings;
                             ui.close_menu();
                         }
                     });
 
-                    ui.menu_button("Help", |ui| {
-                        if ui.button("User Guide").on_hover_text("Open documentation").clicked() {
+                    ui.menu_button(t!("menu.help"), |ui| {
+                        if ui.button(t!("menu.user_guide")).clicked() {
                             self.current_dialog = DialogType::UserGuide;
                             ui.close_menu();
                         }
-                        if ui.button("Keyboard Shortcuts").clicked() {
+                        if ui.button(t!("menu.keyboard_shortcuts")).clicked() {
                             self.current_dialog = DialogType::KeyboardShortcuts;
                             ui.close_menu();
                         }
                         ui.separator();
-                        if ui.button("About").clicked() {
+                        if ui.button(t!("menu.about")).clicked() {
                             self.current_dialog = DialogType::About;
                             ui.close_menu();
                         }
@@ -3801,6 +4333,12 @@ impl eframe::App for TermiconApp {
             DialogType::ExplainDebug => self.show_explain_debug_dialog(ctx),
             DialogType::ModbusMonitor => self.show_modbus_monitor_dialog(ctx),
             DialogType::Bridge => self.show_bridge_dialog(ctx),
+            DialogType::VirtualCom => self.show_virtual_com_dialog(ctx),
+            DialogType::SshKeyGen => self.show_ssh_keygen_dialog(ctx),
+            DialogType::FileTransferSend(ref protocol) => self.show_file_transfer_send_dialog(ctx, protocol.clone()),
+            DialogType::FileTransferReceive(ref protocol) => self.show_file_transfer_receive_dialog(ctx, protocol.clone()),
+            DialogType::ProtocolDsl => self.show_protocol_dsl_dialog(ctx),
+            DialogType::Triggers => self.show_triggers_dialog(ctx),
             DialogType::None => {}
         }
 

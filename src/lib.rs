@@ -30,8 +30,11 @@
 //!     
 //!     session.send(b"AT\r\n").await?;
 //!     
-//!     while let Some(data) = session.receive().await {
-//!         println!("Received: {:?}", data);
+//!     let mut rx = session.subscribe();
+//!     while let Ok(event) = rx.recv().await {
+//!         if let termicon_core::SessionEvent::DataReceived(data) = event {
+//!             println!("Received: {:?}", data);
+//!         }
 //!     }
 //!     
 //!     Ok(())
@@ -43,8 +46,8 @@
 #![warn(clippy::pedantic)]
 #![allow(clippy::module_name_repetitions)]
 
-// Initialize i18n - load translations from locales folder
-rust_i18n::i18n!("locales", fallback = "en");
+// Initialize i18n - load translations from i18n folder (TOML)
+rust_i18n::i18n!("i18n", fallback = "en");
 
 pub mod cli;
 pub mod config;

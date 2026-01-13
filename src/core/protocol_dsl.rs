@@ -65,18 +65,22 @@ pub enum FieldType {
 
 /// Value transformation
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[serde(tag = "type", rename_all = "lowercase")]
 pub enum Transform {
     /// No transformation
     None,
     /// Linear scaling: value * scale + offset
-    Scale { scale: f64, offset: f64 },
+    Scale {
+        scale: f64,
+        #[serde(default)]
+        offset: f64,
+    },
     /// Value mapping
-    Map(HashMap<String, String>),
+    Map { map: HashMap<String, String> },
     /// Bit mask
-    Mask(u64),
+    Mask { mask: u64 },
     /// Custom formula (simple expression)
-    Formula(String),
+    Formula { formula: String },
 }
 
 impl Default for Transform {
@@ -613,6 +617,8 @@ mod tests {
         }
     }
 }
+
+
 
 
 
